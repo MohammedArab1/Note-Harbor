@@ -1,10 +1,34 @@
 import { Box, TextField, Button } from "@mui/material"
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { loginQuery } from "../../Utils/Queries"
+import { useMutation } from "react-query"
 
 const Login = () => {
-  const [Email, setEmail] = useState("")
-  const [Password, setPassword] = useState("")
+  const navigate = useNavigate()
+  const loginMutation = useMutation(loginQuery, {
+    onSuccess: (data) => {
+      sessionStorage.setItem('token',JSON.stringify(data.token))
+      const existingUser = {email:data.user.email,firstName:data.firstName,lastName:data.lastName}
+      sessionStorage.setItem('user',JSON.stringify(existingUser))
+      navigate('/UserHome')
+    },
+    onError: () => {
+      setInvalid(true)
+        setTimeout(() => {
+          setInvalid(false);
+        }, "4000");
+    }
+  })
+
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [invalid, setInvalid] = useState("")
+
+  const handleLogin = async(email, password) => {
+    loginMutation.mutate({password,email})
+  }
+
   return (
     <div>
       <Box
@@ -16,11 +40,13 @@ const Login = () => {
       autoComplete="off"
     >
       <div>
+        {loginMutation.isLoading && <p>Loading</p>}
+        {invalid && <p>Wrong credentials!</p>}
         <TextField
           required
           id="outlined-required"
           label="Email"
-          defaultValue="Hello World"
+          onChange={(event) => {setEmail(event.target.value)}}
         />
 
         <TextField
@@ -28,12 +54,12 @@ const Login = () => {
           label="Password"
           type="password"
           autoComplete="current-password"
+          onChange={(event) => {setPassword(event.target.value)}}
         />
       </div>
       
-      <Button variant="text" component={Link} to="/UserHome">Login</Button>
+      <Button variant="text" onClick={() => {handleLogin(email,password)}}>Login</Button>
     </Box>
-      
     </div>
   )
 }

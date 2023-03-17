@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom';
+import PrivateRoutes from './Authentication/PrivateRoutes';
 import Login from './Authentication/Login';
 import Register from './Authentication/Register';
 import Main from './Home';
@@ -13,7 +14,9 @@ const App = () => {
         <Route path='/' element={<Main />}/>
         <Route path='/login' element={<Login />}/>
         <Route path='/Register' element={<Register />}/>
-        <Route path='/UserHome' element={<UserHomePage />}/>
+        <Route element={<PrivateRoutes/>}>
+          <Route path='/UserHome' element={<UserHomePage />}/>
+        </Route>
       </Routes>
     </div>
   )
