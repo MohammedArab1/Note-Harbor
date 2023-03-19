@@ -7,3 +7,9 @@ export const loginQuery = userObject =>
   .then(
     res => res.data
   )
+
+export const registerQuery = userObject => {
+  return axios.post(`${baseUrl}/user/register`, userObject).then(
+    res => res.data
+  )
+}

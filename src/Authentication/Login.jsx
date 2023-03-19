@@ -3,32 +3,34 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { loginQuery } from "../../Utils/Queries"
 import { useMutation } from "react-query"
+import { useForm } from "react-hook-form"
+import { loginSchema } from "../../Utils/yupSchemas"
+import { yupResolver } from "@hookform/resolvers/yup";
+
 
 const Login = () => {
+  const {register, handleSubmit, formState:{errors}} = useForm({
+    resolver:yupResolver(loginSchema)
+  })
   const navigate = useNavigate()
   const loginMutation = useMutation(loginQuery, {
     onSuccess: (data) => {
-      sessionStorage.setItem('token',JSON.stringify(data.token))
-      const existingUser = {email:data.user.email,firstName:data.firstName,lastName:data.lastName}
-      sessionStorage.setItem('user',JSON.stringify(existingUser))
+      const user = {token:data.token,email:data.user.email,firstName:data.user.firstName,lastName:data.user.lastName}
+      sessionStorage.setItem('user',JSON.stringify(user))
       navigate('/UserHome')
     },
-    onError: () => {
+    onError: (error) => {
       setInvalid(true)
         setTimeout(() => {
           setInvalid(false);
         }, "4000");
     }
   })
-
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [invalid, setInvalid] = useState("")
-
-  const handleLogin = async(email, password) => {
+  const handleLogin = async(data) => {
+    const {email, password} = data
     loginMutation.mutate({password,email})
   }
-
   return (
     <div>
       <Box
@@ -38,27 +40,32 @@ const Login = () => {
       }}
       noValidate
       autoComplete="off"
+      onSubmit={handleSubmit((data)=>{handleLogin(data)})}
     >
       <div>
         {loginMutation.isLoading && <p>Loading</p>}
         {invalid && <p>Wrong credentials!</p>}
         <TextField
+          error={errors.email ? true : false}
+          helperText={errors.email?.message}
           required
-          id="outlined-required"
+          id="email"
           label="Email"
-          onChange={(event) => {setEmail(event.target.value)}}
+          {...register("email")}
         />
-
         <TextField
-          id="outlined-password-input"
+          error={errors.password ? true : false}
+          helperText={errors.password?.message}
+          id="password"
           label="Password"
           type="password"
           autoComplete="current-password"
-          onChange={(event) => {setPassword(event.target.value)}}
+          required
+          {...register("password")}
         />
       </div>
       
-      <Button variant="text" onClick={() => {handleLogin(email,password)}}>Login</Button>
+      <Button variant="text" type="submit">Login</Button>
     </Box>
     </div>
   )
