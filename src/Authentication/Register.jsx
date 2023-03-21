@@ -6,6 +6,7 @@ import { useMutation } from "react-query"
 import { useForm } from "react-hook-form"
 import { registerSchema } from "../../Utils/yupSchemas"
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from "axios"
 
 const Register = () => {
   const [invalid, setInvalid] = useState("")
@@ -15,8 +16,9 @@ const Register = () => {
   })
   const registerMutation = useMutation(registerQuery, {
     onSuccess: (data) => {
-      const user = {token:data.token,email:data.newUser.email,firstName:data.newUser.firstName,lastName:data.newUser.lastName}
+      const user = {token:data.token,id:data.newUser._id,email:data.newUser.email,firstName:data.newUser.firstName,lastName:data.newUser.lastName}
       sessionStorage.setItem('user',JSON.stringify(user))
+      // axios.defaults.headers.common['Authorization'] = data.token;
       navigate('/UserHome')
     },
     onError:(error) => {

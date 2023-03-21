@@ -6,6 +6,7 @@ import { useMutation } from "react-query"
 import { useForm } from "react-hook-form"
 import { loginSchema } from "../../Utils/yupSchemas"
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from "axios"
 
 
 const Login = () => {
@@ -15,8 +16,9 @@ const Login = () => {
   const navigate = useNavigate()
   const loginMutation = useMutation(loginQuery, {
     onSuccess: (data) => {
-      const user = {token:data.token,email:data.user.email,firstName:data.user.firstName,lastName:data.user.lastName}
+      const user = {token:data.token,id:data.user._id,email:data.user.email,firstName:data.user.firstName,lastName:data.user.lastName}
       sessionStorage.setItem('user',JSON.stringify(user))
+      // axios.defaults.headers.common['Authorization'] = data.token;
       navigate('/UserHome')
     },
     onError: (error) => {
