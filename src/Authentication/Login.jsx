@@ -6,7 +6,6 @@ import { useMutation } from "react-query"
 import { useForm } from "react-hook-form"
 import { loginSchema } from "../../Utils/yupSchemas"
 import { yupResolver } from "@hookform/resolvers/yup";
-import axios from "axios"
 
 
 const Login = () => {

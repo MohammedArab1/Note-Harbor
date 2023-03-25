@@ -1,37 +1,28 @@
 import { Navigate, Outlet} from "react-router-dom"
 import { returnSessionObject } from "../../Utils/Utils"
-import { useQuery } from "react-query"
-import { validateTokenExpiryDate } from "../../Utils/Queries"
+import jwt_decode from "jwt-decode"
 
 
 const PrivateRoutes = () => {
-
-  const {isLoading,data} = useQuery('validateTokenExpiry',async () => {
-    const user = sessionStorage.getItem('user')
-    if (!user) {
-      return false
-    }
-    const expiredEndpoint = await validateTokenExpiryDate((returnSessionObject().token))
-    if (expiredEndpoint.expired === true) {
-      sessionStorage.removeItem('user')
-      return false
-    }
-    return true
-  })
-
-  if (isLoading) {
-    return <div>loading...</div>
-  }
   
-
+  const user = sessionStorage.getItem('user')
+  var isExpired = false;
+  if (user) {
+    const decodedToken = jwt_decode(returnSessionObject().token);
+    const dateNow = new Date();
+    if (decodedToken.exp*1000 < dateNow.getTime()) {
+      console.log("token expired")
+      isExpired = true;
+    }
+  }
   return (
-    (data) ? <Outlet/> : <Navigate to="/login"/>
+    (user && !isExpired) ? <Outlet/> : <Navigate to="/login"/>
   )
 }
 
-//TO FIX NEXT TIME: 1. MAKE THE VALIDATE ENDPOINT SECURE
-//2. LOOK AT QUERIES.JS FILE, FIGURE OUT HOW TO AUTOSET HEADERS
-//3. IN THE BACKEND, GROUPCONTROLLER.JS LINE 24, ENSURE THAT THE .POPULATE IS WORKING, OTHERWISE REMOVE
-//4. in userHomePage.jsx, line 7, uncomment and make it work
+//todo next: add "meetup" collection in db and maybe modify the group collection to include a description and a list of meetups
+
+//todo: refresh the token automatically, currently tokens expire after 1 hour. (https://blog.logrocket.com/using-axios-set-request-headers/ search "Axios interceptors are also useful")
+//todo: remove the 'validate' endpoint
 
 export default PrivateRoutes
