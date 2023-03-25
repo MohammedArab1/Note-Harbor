@@ -17,7 +17,6 @@ const Login = () => {
     onSuccess: (data) => {
       const user = {token:data.token,id:data.user._id,email:data.user.email,firstName:data.user.firstName,lastName:data.user.lastName}
       sessionStorage.setItem('user',JSON.stringify(user))
-      // axios.defaults.headers.common['Authorization'] = data.token;
       navigate('/UserHome')
     },
     onError: (error) => {

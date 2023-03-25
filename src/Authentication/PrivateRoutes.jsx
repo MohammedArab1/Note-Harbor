@@ -21,6 +21,8 @@ const PrivateRoutes = () => {
 }
 
 //todo next: add "meetup" collection in db and maybe modify the group collection to include a description and a list of meetups
+//todo: add "Create group" and "join group" functionality
+//todo remove validation from fields in login page
 
 //todo: refresh the token automatically, currently tokens expire after 1 hour. (https://blog.logrocket.com/using-axios-set-request-headers/ search "Axios interceptors are also useful")
 //todo: remove the 'validate' endpoint

@@ -50,6 +50,13 @@ export const fetchGroupPerUserId = (userId) => {
   )
 }
 
+export const createGroupQuery = (groupObject) => {
+  return axios.post(`${baseUrl}/group`, groupObject)
+  .then(
+    res => res.data
+  )
+}
+
 //todo REMOVE THIS
 export const validateTokenExpiryDate = (token) => {
   return axios.get(`${baseUrl}/validate`)
