@@ -5,8 +5,10 @@ import { TextField } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from 'react-query';
 import { JoinGroupSchema } from '../../Utils/yupSchemas';
-
+import { joinGroupQuery } from '../../Utils/Queries';
+import { returnSessionObject } from '../../Utils/Utils';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -19,11 +21,37 @@ const style = {
   p: 4,
 };
 
-export const JoinGroupModal = () => {
-  const {register, handleSubmit, formState:{errors}} = useForm({
+export const JoinGroupModal = ({groups,setGroups}) => {
+  const {register, handleSubmit, formState:{errors},setValue} = useForm({
     resolver:yupResolver(JoinGroupSchema) 
   })
+  const JoinGroupMutation = useMutation(joinGroupQuery, {
+    onSuccess: (data) => {
+      const filteredGroups = groups.filter(group => group.accessCode === data.group.accessCode)
+      if (!filteredGroups.length > 0) {
+        //todo make sure that the groups array that already exists and the data.group you're adding are the same.
+        //todo make sure that the groups that you're working with when adding or joining groups are the same type of objects, I don't think they are.
+        setGroups([...groups, data.group])
+      }
+      setOpen(false)
+      setValue("accessCode", "")
+    },
+    onError: (error) => {
+      setInvalid({isInvalid:true, message:error.response.data.error})
+        setTimeout(() => {
+          setInvalid(false);
+        }, "4000");
+    }
+  })
+
+  const handleJoinGroup= async(data) => {
+    const {accessCode} = data
+    const sessionUserId = returnSessionObject().id
+    JoinGroupMutation.mutate({accessCode,newMemberId:sessionUserId})
+  }
+
   const [open, setOpen] = React.useState(false);
+  const [invalid, setInvalid] = React.useState({isInvalid:false, message:""});
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -38,9 +66,9 @@ export const JoinGroupModal = () => {
         component="form"
         noValidate
         autoComplete="off"
-        onSubmit={handleSubmit((data)=>{handleLogin(data)})}
+        onSubmit={handleSubmit((data)=>{handleJoinGroup(data)})}
         >
-
+        {invalid.isInvalid && <p>{invalid.message}</p>}
         <TextField
           error={errors.accessCode ? true : false}
           helperText={errors.accessCode?.message}

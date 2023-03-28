@@ -59,7 +59,7 @@ export const CreateGroupModal = ({groups,setGroups}) => {
         component="form"
         noValidate
         autoComplete="off"
-        onSubmit={handleSubmit((data)=>{handleCreateGroup(data)})} //gonna have to change this
+        onSubmit={handleSubmit((data)=>{handleCreateGroup(data)})}
         >
         {invalid && <p>error creating group. Please try again later.</p>}
         <TextField

@@ -27,7 +27,7 @@ const UserHomePage = () => {
       <CreateGroupModal groups={groups} setGroups={setGroups}></CreateGroupModal>
       <br/>
       join a group:
-      <JoinGroupModal></JoinGroupModal>
+      <JoinGroupModal groups={groups} setGroups={setGroups}></JoinGroupModal>
       <br/>
       your groups:
 

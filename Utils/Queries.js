@@ -57,6 +57,13 @@ export const createGroupQuery = (groupObject) => {
   )
 }
 
+export const joinGroupQuery = (groupObject) => {
+  return axios.put(`${baseUrl}/group`, groupObject)
+  .then(
+    res => res.data
+  )
+}
+
 //todo REMOVE THIS
 export const validateTokenExpiryDate = (token) => {
   return axios.get(`${baseUrl}/validate`)
