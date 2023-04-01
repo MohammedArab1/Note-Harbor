@@ -4,14 +4,9 @@ import { useNavigate } from "react-router-dom"
 import { loginQuery } from "../../Utils/Queries"
 import { useMutation } from "react-query"
 import { useForm } from "react-hook-form"
-import { loginSchema } from "../../Utils/yupSchemas"
-import { yupResolver } from "@hookform/resolvers/yup";
-
 
 const Login = () => {
-  const {register, handleSubmit, formState:{errors}} = useForm({
-    resolver:yupResolver(loginSchema)
-  })
+  const {register, handleSubmit, formState:{errors}} = useForm()
   const navigate = useNavigate()
   const loginMutation = useMutation(loginQuery, {
     onSuccess: (data) => {

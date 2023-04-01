@@ -12,13 +12,6 @@ export const registerSchema = Yup.object().shape({
     .oneOf([Yup.ref("password")], "Passwords do not match")
 });
 
-export const loginSchema = Yup.object().shape({
-  email: Yup.string().email().required(),
-  password: Yup.string()
-    .required("Password is required")
-    .min(4, "Password length should be at least 4 characters")
-});
-
 export const createGroupSchema = Yup.object().shape({
   groupName: Yup.string().required("Group name is required"),
   description: Yup.string()

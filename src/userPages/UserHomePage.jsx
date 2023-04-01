@@ -1,6 +1,5 @@
 import { useQuery } from "react-query"
 import { fetchGroupPerUserId } from "../../Utils/Queries"
-import { returnSessionObject } from "../../Utils/Utils"
 import {CreateGroupModal} from "../assets/CreateGroupModal.jsx"
 import { JoinGroupModal } from "../assets/JoinGroupModal"
 import { useState } from "react"
@@ -8,7 +7,7 @@ import { useState } from "react"
 
 const UserHomePage = () => {
   const [groups, setGroups] = useState([])
-  const {isLoading,error,data} = useQuery('groups',() => fetchGroupPerUserId(returnSessionObject().id),{
+  const {isLoading,error,data} = useQuery('groups',() => fetchGroupPerUserId(),{
     onSuccess: (data) => {
       setGroups(data.group)
     }

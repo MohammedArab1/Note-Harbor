@@ -43,8 +43,8 @@ export const registerQuery = userObject => {
   )
 }
 
-export const fetchGroupPerUserId = (userId) => {
-  return axios.get(`${baseUrl}/group/${userId}`)
+export const fetchGroupPerUserId = () => {
+  return axios.get(`${baseUrl}/group`)
   .then(
     res => res.data
   )
@@ -59,14 +59,6 @@ export const createGroupQuery = (groupObject) => {
 
 export const joinGroupQuery = (groupObject) => {
   return axios.put(`${baseUrl}/group`, groupObject)
-  .then(
-    res => res.data
-  )
-}
-
-//todo REMOVE THIS
-export const validateTokenExpiryDate = (token) => {
-  return axios.get(`${baseUrl}/validate`)
   .then(
     res => res.data
   )
