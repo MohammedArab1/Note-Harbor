@@ -3,15 +3,20 @@ import { fetchGroupPerUserId } from "../../Utils/Queries"
 import {CreateGroupModal} from "../assets/CreateGroupModal.jsx"
 import { JoinGroupModal } from "../assets/JoinGroupModal"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 
 const UserHomePage = () => {
+  const navigate = useNavigate()
   const [groups, setGroups] = useState([])
   const {isLoading,error,data} = useQuery('groups',() => fetchGroupPerUserId(),{
     onSuccess: (data) => {
       setGroups(data.group)
     }
   })
+  const handleClick = (groupId) => {
+    navigate('/GroupDetails', { state: { groupId} });
+  }
   if (error) return <p>error</p>
   if (isLoading) return <p>loading</p>
   return (
@@ -33,7 +38,7 @@ const UserHomePage = () => {
       {groups.map((group,i) => {
         return (
           <div key={i}>
-            <p>{group.groupName}</p>
+            <button onClick={() => handleClick(group._id)} >{group.groupName}</button>
           </div>
         )
       })}

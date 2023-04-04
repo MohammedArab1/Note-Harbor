@@ -9,7 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios"
 
 const Register = () => {
-  const [invalid, setInvalid] = useState("")
+  const [invalid, setInvalid] = useState({isInvalid:false, message:""})
   const navigate = useNavigate()
   const {register, handleSubmit, formState:{errors}} = useForm({
     resolver:yupResolver(registerSchema)
@@ -18,11 +18,10 @@ const Register = () => {
     onSuccess: (data) => {
       const user = {token:data.token,id:data.newUser._id,email:data.newUser.email,firstName:data.newUser.firstName,lastName:data.newUser.lastName}
       sessionStorage.setItem('user',JSON.stringify(user))
-      // axios.defaults.headers.common['Authorization'] = data.token;
       navigate('/UserHome')
     },
     onError:(error) => {
-      setInvalid(true)
+      setInvalid({isInvalid:true, message:error.response.data.error})
         setTimeout(() => {
           setInvalid(false);
         }, "4000");
@@ -37,7 +36,7 @@ const Register = () => {
   return (
     <div>
     {registerMutation.isLoading && <p>Loading</p>}
-    {invalid && <p>Error creating new user. Please fix errors and submit again.</p>}
+    {invalid.isInvalid && <p>{invalid.message}</p>}
     <Box
     component="form"
     sx={{

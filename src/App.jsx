@@ -5,6 +5,7 @@ import Login from './Authentication/Login';
 import Register from './Authentication/Register';
 import Main from './Home';
 import UserHomePage from './userPages/UserHomePage';
+import GroupDetails from './userPages/GroupDetails';
 
 const App = () => {
 
@@ -16,6 +17,7 @@ const App = () => {
         <Route path='/Register' element={<Register />}/>
         <Route element={<PrivateRoutes/>}>
           <Route path='/UserHome' element={<UserHomePage />}/>
+          <Route path='/GroupDetails' element={<GroupDetails />}/>
         </Route>
       </Routes>
     </div>

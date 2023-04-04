@@ -50,6 +50,14 @@ export const fetchGroupPerUserId = () => {
   )
 }
 
+export const fetchGroupById = (groupId) => {
+  console.log("groupId: ", groupId)
+  return axios.get(`${baseUrl}/group/${groupId}`)
+  .then(
+    res => res.data
+  )
+}
+
 export const createGroupQuery = (groupObject) => {
   return axios.post(`${baseUrl}/group`, groupObject)
   .then(

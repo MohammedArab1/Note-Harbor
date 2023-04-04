@@ -21,7 +21,6 @@ const PrivateRoutes = () => {
 }
 
 //todo next: add "meetup" collection in db 
-//todo make sure that you can't register with an email that already exists
 
 //todo: refresh the token automatically, currently tokens expire after 1 hour. (https://blog.logrocket.com/using-axios-set-request-headers/ search "Axios interceptors are also useful")
 
