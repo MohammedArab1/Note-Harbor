@@ -11,7 +11,6 @@ const PrivateRoutes = () => {
     const decodedToken = jwt_decode(returnSessionObject().token);
     const dateNow = new Date();
     if (decodedToken.exp*1000 < dateNow.getTime()) {
-      console.log("token expired")
       isExpired = true;
     }
   }
@@ -20,7 +19,7 @@ const PrivateRoutes = () => {
   )
 }
 
-//todo next: add "meetup" collection in db 
+//todo next: allow user to create a meetup (Only group leader can create a meetup)
 
 //todo: refresh the token automatically, currently tokens expire after 1 hour. (https://blog.logrocket.com/using-axios-set-request-headers/ search "Axios interceptors are also useful")
 

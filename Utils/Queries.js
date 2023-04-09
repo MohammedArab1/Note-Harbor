@@ -51,7 +51,6 @@ export const fetchGroupPerUserId = () => {
 }
 
 export const fetchGroupById = (groupId) => {
-  console.log("groupId: ", groupId)
   return axios.get(`${baseUrl}/group/${groupId}`)
   .then(
     res => res.data
