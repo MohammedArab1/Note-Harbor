@@ -3,7 +3,7 @@ import { useQuery } from "react-query"
 import { fetchGroupById } from "../../Utils/Queries"
 import { useLocation } from "react-router-dom"
 import { Navigate } from "react-router-dom"
-import { returnSessionObject, isUserLeader } from "../../Utils/Utils"
+import { isUserLeader } from "../../Utils/Utils"
 
 
 const GroupDetails = () => {
@@ -11,9 +11,7 @@ const GroupDetails = () => {
   {if (!state) return <Navigate to="/UserHome"/>}
   const { groupId } = state;
   const {isLoading,error,data} = useQuery('group',() => fetchGroupById(groupId))
-  if (!isLoading) {
-    console.log("isleader: ", isUserLeader(data.group.leader._id))
-  }
+
   if (error) return <p>error</p>
   if (isLoading) return <p>loading</p>
   return (

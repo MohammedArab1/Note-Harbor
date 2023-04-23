@@ -34,7 +34,6 @@ const UserHomePage = () => {
       <JoinGroupModal groups={groups} setGroups={setGroups}></JoinGroupModal>
       <br/>
       your groups:
-
       {groups.map((group,i) => {
         return (
           <div key={i}>

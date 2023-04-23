@@ -27,7 +27,7 @@ export const CreateGroupModal = ({groups,setGroups}) => {
   })
   const CreateGroupMutation = useMutation(createGroupQuery, {
     onSuccess: (data) => {
-      setGroups([...groups, data.newGroup])
+      setGroups([...groups, data])
       setOpen(false)
       setValue("groupName", "")
       setValue("description", "")

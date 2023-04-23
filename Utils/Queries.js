@@ -4,21 +4,6 @@ import { returnSessionObject } from './Utils'
 const baseUrl = 'http://localhost:3001/api'
 
 
-//The following block of code was meant to act as an interceptor to take responses which contain tokens with updated expiry time and set that
-//as the new token in sessionStorage. However, it is not working as intended. Leaving it as is for now and token will simply be 1 hour long. 
-// axios.interceptors.response.use(
-//   response => {
-//     // Retrieve specific information from the response and set it as part of sessionStorage
-//     const data = response.data;
-//     // console.log("new updated token: ", jwt_decode(data.token))
-//     // const user = {token:data.token,id:data.newUser._id,email:data.newUser.email,firstName:data.newUser.firstName,lastName:data.newUser.lastName}
-//     // const oldUser = sessionStorage.getItem('user')
-//     sessionStorage.setItem('user',JSON.stringify({...returnSessionObject(),token:data.token}))
-    
-//     // const specificInfo = data.specificInfo; // replace "specificInfo" with the name of the specific information you want to retrieve from the response
-//     // sessionStorage.setItem('specificInfo', specificInfo);
-
-
 // Request interceptors for API calls. This will add the token to the header of every request
 axios.interceptors.request.use(
   config => {
@@ -29,6 +14,19 @@ axios.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+// Response interceptors for API calls. This will check if the token is expired and redirect to login page if it is
+axios.interceptors.response.use((response) => {
+  return response;
+}, (error) => {
+  if (error.response.data.error === "jwt expired") {
+    window.location.href = '/login'
+  }
+  return Promise.reject(error);
+});
+
+
+
 export const loginQuery = userObject =>{
   return axios.post(`${baseUrl}/login`, userObject)
   .then(

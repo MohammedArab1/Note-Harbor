@@ -4,14 +4,16 @@ import { useNavigate } from "react-router-dom"
 import { loginQuery } from "../../Utils/Queries"
 import { useMutation } from "react-query"
 import { useForm } from "react-hook-form"
+import { useAuth } from "../../customHooks/useAuth"
 
 const Login = () => {
+  const {login} = useAuth()
   const {register, handleSubmit, formState:{errors}} = useForm()
   const navigate = useNavigate()
   const loginMutation = useMutation(loginQuery, {
     onSuccess: (data) => {
       const user = {token:data.token,id:data.user._id,email:data.user.email,firstName:data.user.firstName,lastName:data.user.lastName}
-      sessionStorage.setItem('user',JSON.stringify(user))
+      login(user)
       navigate('/UserHome')
     },
     onError: (error) => {
