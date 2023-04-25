@@ -9,6 +9,7 @@ const NavigationBar= () => {
   const loggedInNavBar = () => {
     return (
       <div>
+        <button onClick={(e) => {onGenericClick(e,'/UserHome')}}>UserHome</button>
         <button onClick={(e) => {onLogoutClick(e)}}>Logout</button>
       </div>
     )
@@ -17,8 +18,8 @@ const NavigationBar= () => {
   const loggedOutNavBar = () => {
     return (
       <div>
-        <button onClick={(e) => {onLoginClick(e)}}>login</button>
-        <button onClick={(e) => {onRegisterClick(e)}}>Register</button>
+        <button onClick={(e) => {onGenericClick(e,'/login')}}>login</button>
+        <button onClick={(e) => {onGenericClick(e,'/register')}}>Register</button>
       </div>
     )
   }
@@ -29,14 +30,9 @@ const NavigationBar= () => {
     navigate('/login')
   }
 
-  const onLoginClick = (e) => {
+  const onGenericClick = (e, path) => {
     e.preventDefault()
-    navigate('/login')
-  }
-
-  const onRegisterClick = (e) => {
-    e.preventDefault()
-    navigate('/register')
+    navigate(path)
   }
 
   return (

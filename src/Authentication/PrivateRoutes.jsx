@@ -13,10 +13,9 @@ const PrivateRoutes = () => {
 
 
 //todo next: make sure all errors retrieve correct error messages
-//todo next: make it so that user can't reach login page or register page if logged in already
 
-
-//todo usersHomePage line 18, don't know if I want state, I can just put a parameter there (:id as route)
+//todo next: it seems like the issue I had earlier is not fixed. if the token expires and the user tries to make another request, he is supposed to be led back to the login page. 
+  //Make sure of that (axios response interceptor should be working)(seems to only happen when you try to access groupDetails with an expired token)
 
 //todo next: allow user to create a meetup (Only group leader can create a meetup)
 

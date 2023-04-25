@@ -15,7 +15,7 @@ const UserHomePage = () => {
     }
   })
   const handleClick = (groupId) => {
-    navigate('/GroupDetails', { state: { groupId} });
+    navigate(`/GroupDetails/${groupId}`, { state: { groupId} });
   }
   if (error) return <p>error</p>
   if (isLoading) return <p>loading</p>

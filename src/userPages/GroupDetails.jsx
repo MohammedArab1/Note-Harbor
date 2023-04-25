@@ -2,18 +2,36 @@ import { Button } from "@mui/material"
 import { useQuery } from "react-query"
 import { fetchGroupById } from "../../Utils/Queries"
 import { useLocation } from "react-router-dom"
-import { Navigate } from "react-router-dom"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 import { isUserLeader } from "../../Utils/Utils"
+import { useAuth } from "../../customHooks/useAuth"
 
 
 const GroupDetails = () => {
-  const {state} = useLocation();
-  {if (!state) return <Navigate to="/UserHome"/>}
-  const { groupId } = state;
-  const {isLoading,error,data} = useQuery('group',() => fetchGroupById(groupId))
+  const {user} = useAuth()
+  const {groupId} = useParams()
+  const navigate = useNavigate()
+  const {isLoading,error,data} = useQuery('group',() => fetchGroupById(groupId),{
+    onSuccess: (data) => {
+      if (data.group===null) {
+        return navigate('/UserHome')
+      }
+      const members = data.group.members
+      const userExists = members.some(member => member._id === user.id)
+      if (!userExists) {
+        return navigate('/UserHome')
+      }
+    },
+    onError: (error) => {
+      navigate('/UserHome')
+    },
+    retry: false,
+    refetchOnReconnect: 'Always'
+  })
 
   if (error) return <p>error</p>
   if (isLoading) return <p>loading</p>
+  if (data.group===null) return <p>group does not exist</p>
   return (
     <div>
       <p>Group name: {data.group.groupName}</p>
@@ -29,6 +47,7 @@ const GroupDetails = () => {
         )
       })}
       { isUserLeader(data.group.leader._id) && <Button variant="text" type="submit">Create meetup</Button>}
+      <button onClick={() => navigate(-1)}>go back</button>
     </div>
   )
   }
