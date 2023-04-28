@@ -15,15 +15,15 @@ axios.interceptors.request.use(
     }
 );
 
-// Response interceptors for API calls. This will check if the token is expired and redirect to login page if it is
-axios.interceptors.response.use((response) => {
-  return response;
-}, (error) => {
-  if (error.response.data.error === "jwt expired") {
-    window.location.href = '/login'
-  }
-  return Promise.reject(error);
-});
+// // Response interceptors for API calls. This will check if the token is expired and redirect to login page if it is
+// axios.interceptors.response.use((response) => {
+//   return response;
+// }, (error) => {
+//   if (error.response.data.error === "jwt expired" ) {
+//     window.location.href = '/login'
+//   }
+//   return Promise.reject(error);
+// });
 
 
 

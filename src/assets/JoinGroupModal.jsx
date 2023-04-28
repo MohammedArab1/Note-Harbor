@@ -27,9 +27,11 @@ export const JoinGroupModal = ({groups,setGroups}) => {
   })
   const JoinGroupMutation = useMutation(joinGroupQuery, {
     onSuccess: (data) => {
-      const filteredGroups = groups.filter(group => group.accessCode === data.group.accessCode)
+      const filteredGroups = groups.filter(group => {
+        return group.accessCode === data.accessCode
+      })
       if (!filteredGroups.length > 0) {
-        setGroups([...groups, data.group])
+        setGroups([...groups, data])
       }
       setOpen(false)
       setValue("accessCode", "")

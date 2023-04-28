@@ -7,17 +7,16 @@ export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(true)
   const { user, addUser, removeUser } = useUser()
   const { getItem, removeItem } = useLocalStorage()
-
   useEffect(() => {
-    const user = getItem('user')
-    if (user) {
-      const decodedToken = jwt_decode(user.token);
+    const sessionStorageUser = getItem('user')
+    if (sessionStorageUser) {
+      const decodedToken = jwt_decode(sessionStorageUser.token);
       const dateNow = new Date();
       if (!(decodedToken.exp*1000 < dateNow.getTime())) {
-        addUser(user)
+        addUser(sessionStorageUser)
       }
       else {
-        removeItem('user')
+        logout()
       }
     }
     setIsLoading(false)

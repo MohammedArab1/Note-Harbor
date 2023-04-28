@@ -36,6 +36,7 @@ const GroupDetails = () => {
     <div>
       <p>Group name: {data.group.groupName}</p>
       {data.group.description && <p>Group description: {data.group.description}</p>}
+      <p>Access Code: {data.group.accessCode}</p>
       <h2>MEMBERS:</h2>
       {data.group.members.map((member,i) => {
         return (
