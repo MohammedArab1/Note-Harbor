@@ -68,3 +68,11 @@ export const joinGroupQuery = (groupObject) => {
     res => res.data
   )
 }
+
+export const deleteGroupQuery = (groupId) => {
+  console.log("in deleteGroupQuery, groupId: ", groupId)
+  return axios.delete(`${baseUrl}/group/${groupId}`)
+  .then(
+    res => res.data
+  )
+}

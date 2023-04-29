@@ -14,6 +14,7 @@ const PrivateRoutes = () => {
 //todo next: allow user to create a meetup (Only group leader can create a meetup)
 
 //todo next: Group leader can change group details. Can leave from group. Can delete group. Can kick members from group.
+  //Added endpoint for deleting group in backend with delete request at /api/groups/:groupId
 
 //todo: refresh the token automatically, currently tokens expire after 1 hour. (https://blog.logrocket.com/using-axios-set-request-headers/ search "Axios interceptors are also useful")
 

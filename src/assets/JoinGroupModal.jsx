@@ -45,7 +45,6 @@ export const JoinGroupModal = ({groups,setGroups}) => {
   })
   const handleJoinGroup= async(data) => {
     const {accessCode} = data
-    // const sessionUserId = returnSessionObject().id
     JoinGroupMutation.mutate({accessCode})
   }
 
