@@ -1,32 +1,16 @@
 import { Box, TextField, Button } from "@mui/material"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { registerQuery } from "../../Utils/Queries"
-import { useMutation } from "react-query"
 import { useForm } from "react-hook-form"
 import { registerSchema } from "../../Utils/yupSchemas"
 import { yupResolver } from "@hookform/resolvers/yup";
-import axios from "axios"
+import { useMutations } from "../../customHooks/useMutations"
 
 const Register = () => {
-  const [invalid, setInvalid] = useState({isInvalid:false, message:""})
-  const navigate = useNavigate()
+
+  const {registerMutation, invalid} = useMutations()
   const {register, handleSubmit, formState:{errors}} = useForm({
     resolver:yupResolver(registerSchema)
   })
-  const registerMutation = useMutation(registerQuery, {
-    onSuccess: (data) => {
-      const user = {token:data.token,id:data.newUser._id,email:data.newUser.email,firstName:data.newUser.firstName,lastName:data.newUser.lastName}
-      sessionStorage.setItem('user',JSON.stringify(user))
-      navigate('/UserHome')
-    },
-    onError:(error) => {
-      setInvalid({isInvalid:true, message:error.response.data.error})
-        setTimeout(() => {
-          setInvalid(false);
-        }, "4000");
-    }
-  })
+
 
   const handleRegister = async (data) => {
     const {firstName,lastName,email,password} = data

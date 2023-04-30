@@ -1,19 +1,17 @@
 import { Button } from "@mui/material"
-import { useQuery, useMutation } from "react-query"
+import { useQuery} from "react-query"
 import { fetchGroupById } from "../../Utils/Queries"
-import { useLocation } from "react-router-dom"
-import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { isUserLeader } from "../../Utils/Utils"
 import { useAuth } from "../../customHooks/useAuth"
-import { deleteGroupQuery } from "../../Utils/Queries"
-import { useState } from "react"
-
+import { useMutations } from "../../customHooks/useMutations"
 
 const GroupDetails = () => {
+  const {deleteGroupMutation,invalid} = useMutations()
   const {user} = useAuth()
   const {groupId} = useParams()
   const navigate = useNavigate()
-  const [invalid, setInvalid] = useState({isInvalid:false, message:""})
+  
   const {isLoading,error,data} = useQuery('group',() => fetchGroupById(groupId),{
     onSuccess: (data) => {
       if (data.group===null) {
@@ -30,19 +28,6 @@ const GroupDetails = () => {
     },
     retry: false,
     refetchOnReconnect: 'Always'
-  })
-
-  const deleteGroupMutation = useMutation(deleteGroupQuery,{
-    onSuccess: (data) => {
-      console.log("success in deleting the group")
-      navigate('/UserHome')
-    },
-    onError: (error) => {
-      setInvalid({isInvalid:true,message:error.response.data.error})
-      setTimeout(() => {
-        setInvalid({isInvalid:false,message:""})
-      }, 4000);
-    }
   })
 
   if (error) return <p>error</p>

@@ -6,8 +6,7 @@ import Modal from '@mui/material/Modal';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createGroupSchema } from '../../Utils/yupSchemas';
-import { useMutation } from 'react-query';
-import { createGroupQuery } from '../../Utils/Queries';
+import { useMutations } from '../../customHooks/useMutations';
 
 const style = {
   position: 'absolute',
@@ -22,31 +21,25 @@ const style = {
 };
 
 export const CreateGroupModal = ({groups,setGroups}) => {
+  const {createGroupMutation, invalid} = useMutations()
   const {register, handleSubmit, formState:{errors}, setValue} = useForm({
     resolver:yupResolver(createGroupSchema) 
   })
-  const CreateGroupMutation = useMutation(createGroupQuery, {
-    onSuccess: (data) => {
-      setGroups([...groups, data])
-      setOpen(false)
-      setValue("groupName", "")
-      setValue("description", "")
-    },
-    onError: (error) => {
-      setInvalid(true)
-        setTimeout(() => {
-          setInvalid(false);
-        }, "4000");
-    }
-  })
+
   const [open, setOpen] = React.useState(false);
-  const [invalid, setInvalid] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleCreateGroup= async(data) => {
     const {groupName, description} = data
-    CreateGroupMutation.mutate({groupName,description})
+    createGroupMutation.mutate({groupName,description}, {
+      onSuccess: (data) => {
+        setGroups([...groups, data])
+        setOpen(false)
+        setValue("groupName", "")
+        setValue("description", "")
+      }
+    })
   }
   return (
     <div>
@@ -61,7 +54,7 @@ export const CreateGroupModal = ({groups,setGroups}) => {
         autoComplete="off"
         onSubmit={handleSubmit((data)=>{handleCreateGroup(data)})}
         >
-        {invalid && <p>error creating group. Please try again later.</p>}
+        {invalid.isInvalid && <p>{invalid.message}</p>}
         <TextField
           error={errors.groupName ? true : false}
           helperText={errors.groupName?.message}

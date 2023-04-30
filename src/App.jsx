@@ -14,9 +14,10 @@ import { Navigate } from 'react-router-dom';
 const App = () => {
 
   const [user, setUser] = useState(null)
+  const [invalid, setInvalid] = useState({isInvalid:false,message:""})
 
   return (
-    <AuthContext.Provider value={{user, setUser}}>
+    <AuthContext.Provider value={{user, setUser, invalid, setInvalid}}>
       <div>
         <NavigationBar/>
         <Routes>

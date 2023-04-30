@@ -5,9 +5,8 @@ import { TextField } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useMutation } from 'react-query';
 import { JoinGroupSchema } from '../../Utils/yupSchemas';
-import { joinGroupQuery } from '../../Utils/Queries';
+import { useMutations } from '../../customHooks/useMutations';
 
 const style = {
   position: 'absolute',
@@ -25,31 +24,25 @@ export const JoinGroupModal = ({groups,setGroups}) => {
   const {register, handleSubmit, formState:{errors},setValue} = useForm({
     resolver:yupResolver(JoinGroupSchema) 
   })
-  const JoinGroupMutation = useMutation(joinGroupQuery, {
-    onSuccess: (data) => {
-      const filteredGroups = groups.filter(group => {
-        return group.accessCode === data.accessCode
-      })
-      if (!filteredGroups.length > 0) {
-        setGroups([...groups, data])
-      }
-      setOpen(false)
-      setValue("accessCode", "")
-    },
-    onError: (error) => {
-      setInvalid({isInvalid:true, message:error.response.data.error})
-        setTimeout(() => {
-          setInvalid(false);
-        }, "4000");
-    }
-  })
+  const {joinGroupMutation, invalid} = useMutations()
+
   const handleJoinGroup= async(data) => {
     const {accessCode} = data
-    JoinGroupMutation.mutate({accessCode})
+    joinGroupMutation.mutate({accessCode}, {
+      onSuccess: (data) => {
+        const filteredGroups = groups.filter(group => {
+          return group.accessCode === data.accessCode
+        })
+        if (!filteredGroups.length > 0) {
+          setGroups([...groups, data])
+        }
+        setOpen(false)
+        setValue("accessCode", "")
+      }
+    })
   }
 
   const [open, setOpen] = React.useState(false);
-  const [invalid, setInvalid] = React.useState({isInvalid:false, message:""});
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
