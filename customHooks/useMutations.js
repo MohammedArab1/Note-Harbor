@@ -1,5 +1,5 @@
 import { useMutation } from "react-query";
-import { deleteGroupQuery, loginQuery, registerQuery, createGroupQuery, joinGroupQuery } from "../Utils/Queries";
+import { deleteGroupQuery, loginQuery, registerQuery, createGroupQuery, joinGroupQuery, leaveGroupQuery } from "../Utils/Queries";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
@@ -9,7 +9,7 @@ import { AuthContext } from "../context/AuthContext";
 
 export const useMutations = () => {
     const navigate = useNavigate()
-    const {login} = useAuth()
+    const {user,login} = useAuth()
 
     const { invalid, setInvalid } = useContext(AuthContext)
 
@@ -68,5 +68,23 @@ export const useMutations = () => {
         })
     )
 
-    return { deleteGroupMutation, loginMutation,createGroupMutation, registerMutation, joinGroupMutation, invalid }
+    const [leaveGroupMutation, setLeaveGroupMutation] = useState(
+        useMutation(leaveGroupQuery,{
+            onSuccess: (data) => {
+                console.log("in leaveGroupMutation, data: ", data)
+                console.log("user is (from context): ", user)
+                if (!(data.members.includes(user.id))) {
+                    navigate('/UserHome')
+                }
+                else {
+                    navigate(0)
+                }
+            },
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
+
+    return { deleteGroupMutation, loginMutation,createGroupMutation, registerMutation, joinGroupMutation, leaveGroupMutation, invalid }
 }
