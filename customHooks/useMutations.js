@@ -71,8 +71,6 @@ export const useMutations = () => {
     const [leaveGroupMutation, setLeaveGroupMutation] = useState(
         useMutation(leaveGroupQuery,{
             onSuccess: (data) => {
-                console.log("in leaveGroupMutation, data: ", data)
-                console.log("user is (from context): ", user)
                 if (!(data.members.includes(user.id))) {
                     navigate('/UserHome')
                 }

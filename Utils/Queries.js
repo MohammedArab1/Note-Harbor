@@ -76,9 +76,8 @@ export const deleteGroupQuery = (groupId) => {
   )
 }
 
-export const leaveGroupQuery = ({groupId, userId}) => {
-  console.log("in leaveGroupQuery, groupId: ", groupId, "userId: ", userId)
-  return axios.put(`${baseUrl}/group/${groupId}/${userId}`)
+export const leaveGroupQuery = ({groupId,newGroup}) => {
+  return axios.put(`${baseUrl}/group/${groupId}`, newGroup)
   .then(
     res => res.data
   )

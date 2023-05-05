@@ -5,12 +5,23 @@ import { useNavigate, useParams } from "react-router-dom"
 import { isUserLeader } from "../../Utils/Utils"
 import { useAuth } from "../../customHooks/useAuth"
 import { useMutations } from "../../customHooks/useMutations"
+import { useState } from "react"
 
 const GroupDetails = () => {
   const {deleteGroupMutation,invalid, leaveGroupMutation} = useMutations()
   const {user} = useAuth()
   const {groupId} = useParams()
   const navigate = useNavigate()
+  const [group, setGroup] = useState(null)
+  
+  const handleLeaveGroup = (userToBeDeletedId) => {
+    const newGroup = {...group, members: group.members.filter(member => member._id !== userToBeDeletedId)}
+    if (group.leader._id===userToBeDeletedId) {
+      const newLeader = newGroup.members[Math.floor(Math.random() * newGroup.members.length)];
+      newGroup.leader = newLeader
+    }
+    leaveGroupMutation.mutate({groupId:newGroup._id,newGroup})
+  }
   
   const {isLoading,error,data} = useQuery('group',() => fetchGroupById(groupId),{
     onSuccess: (data) => {
@@ -22,6 +33,7 @@ const GroupDetails = () => {
       if (!userExists) {
         return navigate('/UserHome')
       }
+      setGroup(data.group)
     },
     onError: (error) => {
       navigate('/UserHome')
@@ -48,7 +60,9 @@ const GroupDetails = () => {
             <p>Member name: {member.firstName} {member.lastName}</p>
             <p>Member email: {member.email}</p>
             <p>Member id: {member._id}</p>
-            {isUserLeader(data.group.leader._id) && <Button variant="text" type="button" onClick={() => leaveGroupMutation.mutate({groupId, userId:member._id})}>Kick user from group</Button>}
+            {/* {isUserLeader(data.group.leader._id) && <Button variant="text" type="button" onClick={() => leaveGroupMutation.mutate({groupId, userId:member._id})}>Kick user from group</Button>} */}
+            {isUserLeader(data.group.leader._id) && <Button variant="text" type="button" onClick={() => handleLeaveGroup(member._id)}>Kick user from group</Button>}
+
           </div>
         )
       })}
