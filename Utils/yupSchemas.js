@@ -20,3 +20,21 @@ export const createGroupSchema = Yup.object().shape({
 export const JoinGroupSchema = Yup.object().shape({
   accessCode: Yup.string().required("Access code is required"),
 });
+
+export const createMeetupSchema = Yup.object().shape({
+  name: Yup.string().required("Meetup name is required"),
+  description: Yup.string(),
+  dateToPickFrom: Yup.date().required("Date from is required")
+  .typeError('you must specify a valid date'),
+  dateToPickTo: Yup.date().required("Date to is required")
+  .typeError('you must specify a valid date'),
+  location: Yup.string(),
+  minPplNeeded: Yup.number().required("Minimum people needed is required")
+    .typeError('you must specify a number')
+    .min(0, 'you must specify a number greater than 0'),
+  numOfDatesToPick: Yup.number().required("Number of dates to pick is required")
+    .typeError('you must specify a number')
+    .min(0, 'you must specify a number greater than 0'),
+  deadLine: Yup.date().required("Deadline is required")
+    .typeError('you must specify a valid date'),
+});

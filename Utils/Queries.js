@@ -82,3 +82,10 @@ export const leaveGroupQuery = ({groupId,newGroup}) => {
     res => res.data
   )
 }
+
+export const createMeetupQuery = (meetupObject) => {
+  return axios.post(`${baseUrl}/meetup`, meetupObject)
+  .then(
+    res => res.data
+  )
+}

@@ -7,20 +7,23 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { JoinGroupSchema } from '../../Utils/yupSchemas';
 import { useMutations } from '../../customHooks/useMutations';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
 export const JoinGroupModal = ({groups,setGroups}) => {
+
+  const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: isScreenSmall ? '80%' : 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
   const {register, handleSubmit, formState:{errors},setValue} = useForm({
     resolver:yupResolver(JoinGroupSchema) 
   })

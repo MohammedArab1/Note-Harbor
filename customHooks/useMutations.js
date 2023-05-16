@@ -1,5 +1,5 @@
 import { useMutation } from "react-query";
-import { deleteGroupQuery, loginQuery, registerQuery, createGroupQuery, joinGroupQuery, leaveGroupQuery } from "../Utils/Queries";
+import { deleteGroupQuery, loginQuery, registerQuery, createGroupQuery, joinGroupQuery, leaveGroupQuery, createMeetupQuery } from "../Utils/Queries";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
@@ -84,5 +84,13 @@ export const useMutations = () => {
         })
     )
 
-    return { deleteGroupMutation, loginMutation,createGroupMutation, registerMutation, joinGroupMutation, leaveGroupMutation, invalid }
+    const [createMeetupMutation, setCreateMeetupMutation] = useState(
+        useMutation(createMeetupQuery, {
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
+
+    return { deleteGroupMutation, loginMutation,createGroupMutation, registerMutation, joinGroupMutation, leaveGroupMutation, createMeetupMutation, invalid }
 }

@@ -7,6 +7,8 @@ import { useAuth } from "../../customHooks/useAuth"
 import { useMutations } from "../../customHooks/useMutations"
 import { useState } from "react"
 import ConfirmationPopup from "../assets/ConfirmationPopup"
+import { CreateMeetupModal } from "../assets/CreateMeetupModal"
+
 
 const GroupDetails = () => {
   const {deleteGroupMutation,invalid, leaveGroupMutation} = useMutations()
@@ -14,12 +16,9 @@ const GroupDetails = () => {
   const {groupId} = useParams()
   const navigate = useNavigate()
   const [group, setGroup] = useState(null)
+  const [meetups, setMeetups] = useState([])
   const groupLeaderLeaveMessage = "Are you sure you want to leave this group? Since you are the group leader, a random member will be appointed group leader after you leave."
   const groupLeaderDeleteMessage = "Are you sure you want to delete this group?"
-  const handleConfirm = () => {
-    // Code to execute when the confirmation is confirmed
-    console.log('Confirmed!');
-  };
 
   const handleLeaveGroup = (userToBeDeletedId) => {
     const newGroup = {...group, members: group.members.filter(member => member._id !== userToBeDeletedId)}
@@ -48,7 +47,6 @@ const GroupDetails = () => {
     retry: false,
     refetchOnReconnect: 'Always'
   })
-  console.log(group)
   if (error) return <p>error</p>
   if (isLoading) return <p>loading</p>
   if (data.group===null) return <p>group does not exist</p>
@@ -76,7 +74,8 @@ const GroupDetails = () => {
       <p>My name: {user.firstName} {user.lastName}</p>
       <p>My email: {user.email}</p>
       <p>My id: {user.id}</p>
-      { isUserLeader(data.group.leader._id) && <Button variant="text" type="submit">Create meetup</Button>}
+      {/* { isUserLeader(data.group.leader._id) && <Button variant="text" type="submit">Create meetup</Button>} */}
+      { isUserLeader(data.group.leader._id) && <CreateMeetupModal meetups={meetups} setMeetups={setMeetups} groupId={groupId}></CreateMeetupModal>}
       { isUserLeader(data.group.leader._id) && <ConfirmationPopup name="Delete group" message={groupLeaderDeleteMessage} onConfirm={() => deleteGroupMutation.mutate(groupId)}></ConfirmationPopup>}
       <button onClick={() => navigate(-1)}>go back</button>
       <br/>

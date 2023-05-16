@@ -30,7 +30,7 @@ const UserHomePage = () => {
       This page will contain all the groups as well as the next upcoming meetup (also if there are any meetups they haven't given availabilities for then it will show)
       <br/>
       create a group:
-      <CreateGroupModal groups={groups} setGroups={setGroups}></CreateGroupModal>
+      <CreateGroupModal groups={groups} setGroups={setGroups} ></CreateGroupModal>
       <br/>
       join a group:
       <JoinGroupModal groups={groups} setGroups={setGroups}></JoinGroupModal>
