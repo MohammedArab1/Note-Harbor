@@ -89,3 +89,10 @@ export const createMeetupQuery = (meetupObject) => {
     res => res.data
   )
 }
+
+export const fetchMeetupsPerGroupId = (groupId) => {
+  return axios.get(`${baseUrl}/meetup/${groupId}`)
+  .then(
+    res => res.data
+  )
+}

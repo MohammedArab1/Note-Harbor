@@ -36,15 +36,6 @@ export const CreateMeetupModal = ({meetups,setMeetups, groupId}) => {
   const handleClose = () => setOpen(false);
 
   const handleCreateMeetup= async(data) => {
-    // const {groupName, description} = data
-    // createMeetupMutation.mutate({}, {
-    //   onSuccess: (data) => {
-    //     setGroups([...meetups, data])
-    //     setOpen(false)
-    //     setValue("groupName", "")
-    //     setValue("description", "")
-    //   }
-    // })
     var {name, description, dateToPickFrom, dateToPickTo, location, minPplNeeded, numOfDatesToPick, deadLine} = data
     minPplNeeded = {
       type:"absolute",
@@ -103,6 +94,7 @@ export const CreateMeetupModal = ({meetups,setMeetups, groupId}) => {
                     render={({ field }) => (
                         <DatePicker
                         label="Earliest date to meet"
+                        disablePast
                         slotProps={{ 
                           textField: { 
                             variant: 'outlined', error: errors.dateToPickFrom ? true : false, helperText:errors.dateToPickFrom?.message
@@ -118,6 +110,7 @@ export const CreateMeetupModal = ({meetups,setMeetups, groupId}) => {
                     render={({ field }) => (
                         <DatePicker
                         label="Latest date to meet"
+                        disablePast
                         slotProps={{ 
                           textField: { 
                             variant: 'outlined', error: errors.dateToPickTo ? true : false, helperText:errors.dateToPickTo?.message
@@ -160,6 +153,7 @@ export const CreateMeetupModal = ({meetups,setMeetups, groupId}) => {
                   render={({ field }) => (
                       <DatePicker
                       label="Deadline for members to respond"
+                      disablePast
                       slotProps={{ 
                         textField: { 
                           variant: 'outlined', error: errors.deadLine ? true : false, helperText:errors.deadLine?.message
