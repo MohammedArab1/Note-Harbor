@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { returnSessionObject } from './Utils'
 
-const baseUrl = 'http://localhost:3001/api'
+
+const baseUrl = import.meta.env.VITE_REACT_APP_API_URL
 
 
 // Request interceptors for API calls. This will add the token to the header of every request

@@ -28,7 +28,6 @@ export const useMutations = () => {
     const [loginMutation, setLoginMutation] = useState(
         useMutation(loginQuery, {
             onSuccess: (data) => {
-                console.log("logged in!")
                 const user = {token:data.token,id:data.user._id,email:data.user.email,firstName:data.user.firstName,lastName:data.user.lastName}
                 login(user)
                 navigate('/UserHome')
