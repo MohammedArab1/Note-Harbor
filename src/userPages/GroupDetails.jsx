@@ -37,7 +37,7 @@ const GroupDetails = () => {
   };
 
 
-  const {isLoading,error,data} = useQuery('group',() => fetchGroupAndMeetups(groupId),{
+  const {error,data, isFetching} = useQuery('group',() => fetchGroupAndMeetups(groupId),{
     onSuccess: (data) => {
       if (data.group.group===null) {
         return navigate('/UserHome')
@@ -54,12 +54,11 @@ const GroupDetails = () => {
       navigate('/UserHome')
     },
     retry: false,
-    refetchOnReconnect: 'Always'
+    // refetchOnReconnect: 'always'
   })
 
   if (error) return <p>error</p>
-  if (isLoading) return <p>loading</p>
-  if (group===null) return <p>group does not exist</p>
+  if (isFetching) return <p>fetching...</p>
   return (
     <div>
       {invalid.isInvalid && <p>{invalid.message}</p>}
