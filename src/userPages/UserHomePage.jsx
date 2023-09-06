@@ -1,7 +1,7 @@
 import { useQuery } from "react-query"
-import { fetchGroupPerUserId } from "../../Utils/Queries"
-import {CreateGroupModal} from "../assets/CreateGroupModal.jsx"
-import { JoinGroupModal } from "../assets/JoinGroupModal"
+import { fetchProjectPerUserId } from "../../Utils/Queries"
+import {CreateProjectModal} from "../assets/CreateProjectModal.jsx"
+import { JoinProjectModal } from "../assets/JoinProjectModal"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../customHooks/useAuth"
@@ -10,14 +10,14 @@ import { useAuth } from "../../customHooks/useAuth"
 const UserHomePage = () => {
   const {user} = useAuth()
   const navigate = useNavigate()
-  const [groups, setGroups] = useState([])
-  const {isLoading,error,data} = useQuery('groups',() => fetchGroupPerUserId(),{
+  const [projects, setProjects] = useState([])
+  const {isLoading,error,data} = useQuery('projects',() => fetchProjectPerUserId(),{
     onSuccess: (data) => {
-      setGroups(data.group)
+      setProjects(data.project)
     }
   })
-  const handleClick = (groupId) => {
-    navigate(`/GroupDetails/${groupId}`);
+  const handleClick = (projectId) => {
+    navigate(`/ProjectDetails/${projectId}`);
   }
   if (error) return <p>error</p>
   if (isLoading) return <p>loading</p>
@@ -27,19 +27,19 @@ const UserHomePage = () => {
       <br/>
       this page will only be accessible once user logs in.
       <br/>
-      This page will contain all the groups as well as the next upcoming meetup (also if there are any meetups they haven't given availabilities for then it will show)
+      This page will contain all the projects 
       <br/>
-      create a group:
-      <CreateGroupModal groups={groups} setGroups={setGroups} ></CreateGroupModal>
+      create a project:
+      <CreateProjectModal projects={projects} setProjects={setProjects} ></CreateProjectModal>
       <br/>
-      join a group:
-      <JoinGroupModal groups={groups} setGroups={setGroups}></JoinGroupModal>
+      join a project:
+      <JoinProjectModal projects={projects} setProjects={setProjects}></JoinProjectModal>
       <br/>
-      your groups:
-      {groups.map((group,i) => {
+      your projects:
+      {projects.map((project,i) => {
         return (
           <div key={i}>
-            <button onClick={() => handleClick(group._id)} >{group.groupName}</button>
+            <button onClick={() => handleClick(project._id)} >{project.projectName}</button>
           </div>
         )
       })}

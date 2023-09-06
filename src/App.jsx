@@ -6,7 +6,7 @@ import Login from './Authentication/Login';
 import Register from './Authentication/Register';
 import Main from './Home';
 import UserHomePage from './userPages/UserHomePage';
-import GroupDetails from './userPages/GroupDetails';
+import ProjectDetails from './userPages/ProjectDetails';
 import { AuthContext } from '../context/AuthContext';
 import NavigationBar from './Components/NavigationBar';
 import { Navigate } from 'react-router-dom';
@@ -29,7 +29,7 @@ const App = () => {
 
           <Route element={<PrivateRoutes/>}>
             <Route path='/UserHome' element={<UserHomePage />}/>
-            <Route path='/GroupDetails/:groupId' element={<GroupDetails />}/>
+            <Route path='/ProjectDetails/:projectId' element={<ProjectDetails />}/>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

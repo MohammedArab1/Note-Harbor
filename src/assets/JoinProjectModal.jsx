@@ -5,12 +5,12 @@ import { TextField } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
-import { JoinGroupSchema } from '../../Utils/yupSchemas';
+import { JoinProjectSchema } from '../../Utils/yupSchemas';
 import { useMutations } from '../../customHooks/useMutations';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 
-export const JoinGroupModal = ({groups,setGroups}) => {
+export const JoinProjectModal = ({projects,setProjects}) => {
 
   const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const style = {
@@ -25,19 +25,19 @@ export const JoinGroupModal = ({groups,setGroups}) => {
     p: 4,
   };
   const {register, handleSubmit, formState:{errors},setValue} = useForm({
-    resolver:yupResolver(JoinGroupSchema) 
+    resolver:yupResolver(JoinProjectSchema) 
   })
-  const {joinGroupMutation, invalid} = useMutations()
+  const {joinProjectMutation, invalid} = useMutations()
 
-  const handleJoinGroup= async(data) => {
+  const handleJoinProject= async(data) => {
     const {accessCode} = data
-    joinGroupMutation.mutate({accessCode}, {
+    joinProjectMutation.mutate({accessCode}, {
       onSuccess: (data) => {
-        const filteredGroups = groups.filter(group => {
-          return group.accessCode === data.accessCode
+        const filteredProjects = projects.filter(project => {
+          return project.accessCode === data.accessCode
         })
-        if (!filteredGroups.length > 0) {
-          setGroups([...groups, data])
+        if (!filteredProjects.length > 0) {
+          setProjects([...projects, data])
         }
         setOpen(false)
         setValue("accessCode", "")
@@ -51,7 +51,7 @@ export const JoinGroupModal = ({groups,setGroups}) => {
 
   return (
     <div>
-      <Button onClick={handleOpen}>Join a group</Button>
+      <Button onClick={handleOpen}>Join a Project</Button>
       <Modal
         open={open}
         onClose={handleClose}
@@ -60,7 +60,7 @@ export const JoinGroupModal = ({groups,setGroups}) => {
         component="form"
         noValidate
         autoComplete="off"
-        onSubmit={handleSubmit((data)=>{handleJoinGroup(data)})}
+        onSubmit={handleSubmit((data)=>{handleJoinProject(data)})}
         >
         {invalid.isInvalid && <p>{invalid.message}</p>}
         <TextField
@@ -72,7 +72,7 @@ export const JoinGroupModal = ({groups,setGroups}) => {
           {...register("accessCode")}
         />
 
-        <Button variant="text" type="submit">Join group</Button>
+        <Button variant="text" type="submit">Join project</Button>
         </Box>
       </Modal>
     </div>

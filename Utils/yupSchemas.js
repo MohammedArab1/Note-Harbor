@@ -12,29 +12,29 @@ export const registerSchema = Yup.object().shape({
     .oneOf([Yup.ref("password")], "Passwords do not match")
 });
 
-export const createGroupSchema = Yup.object().shape({
-  groupName: Yup.string().required("Group name is required"),
+export const createProjectSchema = Yup.object().shape({
+  projectName: Yup.string().required("Project name is required"),
   description: Yup.string()
 });
 
-export const JoinGroupSchema = Yup.object().shape({
+export const JoinProjectSchema = Yup.object().shape({
   accessCode: Yup.string().required("Access code is required"),
 });
 
-export const createMeetupSchema = Yup.object().shape({
-  name: Yup.string().required("Meetup name is required"),
+export const createSubSectionSchema = Yup.object().shape({
+  name: Yup.string().required("Sub Section name is required"),
   description: Yup.string(),
-  dateToPickFrom: Yup.date().required("Date from is required")
-  .typeError('you must specify a valid date'),
-  dateToPickTo: Yup.date().required("Date to is required")
-  .typeError('you must specify a valid date'),
-  location: Yup.string(),
-  minPplNeeded: Yup.number().required("Minimum people needed is required")
-    .typeError('you must specify a number')
-    .min(0, 'you must specify a number greater than 0'),
-  numOfDatesToPick: Yup.number().required("Number of dates to pick is required")
-    .typeError('you must specify a number')
-    .min(0, 'you must specify a number greater than 0'),
-  deadLine: Yup.date().required("Deadline is required")
-    .typeError('you must specify a valid date'),
+  // dateToPickFrom: Yup.date().required("Date from is required")
+  // .typeError('you must specify a valid date'),
+  // dateToPickTo: Yup.date().required("Date to is required")
+  // .typeError('you must specify a valid date'),
+  // location: Yup.string(),
+  // minPplNeeded: Yup.number().required("Minimum people needed is required")
+  //   .typeError('you must specify a number')
+  //   .min(0, 'you must specify a number greater than 0'),
+  // numOfDatesToPick: Yup.number().required("Number of dates to pick is required")
+  //   .typeError('you must specify a number')
+  //   .min(0, 'you must specify a number greater than 0'),
+  // deadLine: Yup.date().required("Deadline is required")
+  //   .typeError('you must specify a valid date'),
 });

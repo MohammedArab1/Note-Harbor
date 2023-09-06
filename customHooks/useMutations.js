@@ -1,5 +1,5 @@
 import { useMutation } from "react-query";
-import { deleteGroupQuery, loginQuery, registerQuery, createGroupQuery, joinGroupQuery, leaveGroupQuery, createMeetupQuery } from "../Utils/Queries";
+import { deleteProjectQuery, loginQuery, registerQuery, createProjectQuery, joinProjectQuery, leaveProjectQuery, createSubSectionQuery } from "../Utils/Queries";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
@@ -14,8 +14,8 @@ export const useMutations = () => {
     const { invalid, setInvalid } = useContext(AuthContext)
 
 
-    const [deleteGroupMutation, setDeleteGroupMutation] = useState(
-        useMutation(deleteGroupQuery,{
+    const [deleteProjectMutation, setDeleteProjectMutation] = useState(
+        useMutation(deleteProjectQuery,{
             onSuccess: (data) => {
                 navigate('/UserHome')
             },
@@ -52,24 +52,24 @@ export const useMutations = () => {
         })
     )
 
-    const [createGroupMutation, setCreateGroupMutation] = useState(
-        useMutation(createGroupQuery, {
+    const [createProjectMutation, setCreateProjectMutation] = useState(
+        useMutation(createProjectQuery, {
             onError: (error) => {
                 setInvalidError(setInvalid, error)
             }
         })
     )
 
-    const [joinGroupMutation, setJoinGroupMutation] = useState(
-        useMutation(joinGroupQuery, {
+    const [joinProjectMutation, setJoinProjectMutation] = useState(
+        useMutation(joinProjectQuery, {
             onError: (error) => {
                 setInvalidError(setInvalid, error)
             }
         })
     )
 
-    const [leaveGroupMutation, setLeaveGroupMutation] = useState(
-        useMutation(leaveGroupQuery,{
+    const [leaveProjectMutation, setLeaveProjectMutation] = useState(
+        useMutation(leaveProjectQuery,{
             onSuccess: (data) => {
                 if (!(data.members.includes(user.id))) {
                     navigate('/UserHome')
@@ -84,13 +84,13 @@ export const useMutations = () => {
         })
     )
 
-    const [createMeetupMutation, setCreateMeetupMutation] = useState(
-        useMutation(createMeetupQuery, {
+    const [createSubSectionMutation, setCreateSubSectionMutation] = useState(
+        useMutation(createSubSectionQuery, {
             onError: (error) => {
                 setInvalidError(setInvalid, error)
             }
         })
     )
 
-    return { deleteGroupMutation, loginMutation,createGroupMutation, registerMutation, joinGroupMutation, leaveGroupMutation, createMeetupMutation, invalid }
+    return { deleteProjectMutation, loginMutation,createProjectMutation, registerMutation, joinProjectMutation, leaveProjectMutation, createSubSectionMutation, invalid }
 }

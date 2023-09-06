@@ -5,14 +5,14 @@ import { TextField } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
-import { createGroupSchema } from '../../Utils/yupSchemas';
+import { createProjectSchema } from '../../Utils/yupSchemas';
 import { useMutations } from '../../customHooks/useMutations';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 
 
 
-export const CreateGroupModal = ({groups,setGroups}) => {
+export const CreateProjectModal = ({projects,setProjects}) => {
 
   const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const style = {
@@ -26,29 +26,29 @@ export const CreateGroupModal = ({groups,setGroups}) => {
     boxShadow: 24,
     p: 4,
   };
-  const {createGroupMutation, invalid} = useMutations()
+  const {createProjectMutation, invalid} = useMutations()
   const {register, handleSubmit, formState:{errors}, setValue} = useForm({
-    resolver:yupResolver(createGroupSchema) 
+    resolver:yupResolver(createProjectSchema) 
   })
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleCreateGroup= async(data) => {
-    const {groupName, description} = data
-    createGroupMutation.mutate({groupName,description}, {
+  const handleCreateProject= async(data) => {
+    const {projectName, description} = data
+    createProjectMutation.mutate({projectName,description,isPrivate:true}, {
       onSuccess: (data) => {
-        setGroups([...groups, data])
+        setProjects([...projects, data])
         setOpen(false)
-        setValue("groupName", "")
+        setValue("projectName", "")
         setValue("description", "")
       }
     })
   }
   return (
     <div>
-      <Button onClick={handleOpen}>Create a group</Button>
+      <Button onClick={handleOpen}>Create a project</Button>
       <Modal
         open={open}
         onClose={handleClose}
@@ -57,16 +57,16 @@ export const CreateGroupModal = ({groups,setGroups}) => {
         component="form"
         noValidate
         autoComplete="off"
-        onSubmit={handleSubmit((data)=>{handleCreateGroup(data)})}
+        onSubmit={handleSubmit((data)=>{handleCreateProject(data)})}
         >
         {invalid.isInvalid && <p>{invalid.message}</p>}
         <TextField
-          error={errors.groupName ? true : false}
-          helperText={errors.groupName?.message}
+          error={errors.projectName ? true : false}
+          helperText={errors.projectName?.message}
           required
-          id="groupName"
-          label="Group Name"
-          {...register("groupName")}
+          id="projectName"
+          label="Project Name"
+          {...register("projectName")}
         />
         <TextField
           error={errors.description ? true : false}
@@ -76,7 +76,8 @@ export const CreateGroupModal = ({groups,setGroups}) => {
           type="description"
           {...register("description")}
         />
-        <Button variant="text" type="submit">Create group</Button>
+        <h1>ADD A FIELD FOR ISPRIVATE. CURRENTLY JUST DEFAULTING TO TRUE TEMPORARILY.</h1>
+        <Button variant="text" type="submit">Create project</Button>
         </Box>
       </Modal>
     </div>

@@ -27,7 +27,7 @@ axios.interceptors.request.use(
 // });
 
 
-
+//done, nothing to change
 export const loginQuery = userObject =>{
   return axios.post(`${baseUrl}/login`, userObject)
   .then(
@@ -35,6 +35,7 @@ export const loginQuery = userObject =>{
   )
 }
 
+//done, nothing to change
 export const registerQuery = userObject => {
   return axios.post(`${baseUrl}/user/register`, userObject)
   .then(
@@ -42,57 +43,65 @@ export const registerQuery = userObject => {
   )
 }
 
-export const fetchGroupPerUserId = () => {
-  return axios.get(`${baseUrl}/group`)
+//Done, lots of changes in the UserHomePage.jsx
+export const fetchProjectPerUserId = () => {
+  return axios.get(`${baseUrl}/project`)
+  .then(
+    res => res.data
+  )
+}
+//Done (hopefully), lots of changes in the ProjectDetails.jsx
+export const fetchProjectById = (projectId) => {
+  return axios.get(`${baseUrl}/project/${projectId}`)
   .then(
     res => res.data
   )
 }
 
-export const fetchGroupById = (groupId) => {
-  return axios.get(`${baseUrl}/group/${groupId}`)
+//Done (hopefully), lots of changes in the CreateProjectModal.jsx
+export const createProjectQuery = (projectObject) => {
+  return axios.post(`${baseUrl}/project`, projectObject)
   .then(
     res => res.data
   )
 }
 
-export const createGroupQuery = (groupObject) => {
-  return axios.post(`${baseUrl}/group`, groupObject)
+//Done (hopefully), lots of changes in the JoinProjectModal.jsx
+export const joinProjectQuery = (projectObject) => {
+  return axios.put(`${baseUrl}/project`, projectObject)
   .then(
     res => res.data
   )
 }
 
-export const joinGroupQuery = (groupObject) => {
-  return axios.put(`${baseUrl}/group`, groupObject)
+
+//Done (hopefully), lots of changes in the ProjectDetails.jsx
+export const deleteProjectQuery = (projectId) => {
+  return axios.delete(`${baseUrl}/project/${projectId}`)
   .then(
     res => res.data
   )
 }
 
-export const deleteGroupQuery = (groupId) => {
-  return axios.delete(`${baseUrl}/group/${groupId}`)
+//Done (hopefully), lots of changes in the ProjectDetails.jsx
+export const leaveProjectQuery = ({projectId,newProject}) => {
+  return axios.put(`${baseUrl}/project/${projectId}`, newProject)
   .then(
     res => res.data
   )
 }
 
-export const leaveGroupQuery = ({groupId,newGroup}) => {
-  return axios.put(`${baseUrl}/group/${groupId}`, newGroup)
+//Done (hopefully), lots of changes in the CreateSubSectionModal.jsx 
+export const createSubSectionQuery = (subSectionObject) => {
+  return axios.post(`${baseUrl}/subsection`, subSectionObject)
   .then(
     res => res.data
   )
 }
 
-export const createMeetupQuery = (meetupObject) => {
-  return axios.post(`${baseUrl}/meetup`, meetupObject)
-  .then(
-    res => res.data
-  )
-}
-
-export const fetchMeetupsPerGroupId = (groupId) => {
-  return axios.get(`${baseUrl}/meetup/${groupId}`)
+//Done (hopefully), lots of changes in the ProjectDetails.jsx
+export const fetchSubSectionsPerProjectId = (projectId) => {
+  return axios.get(`${baseUrl}/subsection/${projectId}`)
   .then(
     res => res.data
   )
