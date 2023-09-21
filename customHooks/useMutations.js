@@ -1,5 +1,14 @@
 import { useMutation } from "react-query";
-import { deleteProjectQuery, loginQuery, registerQuery, createProjectQuery, joinProjectQuery, leaveProjectQuery, createSubSectionQuery } from "../Utils/Queries";
+import { 
+    deleteProjectQuery, 
+    loginQuery, 
+    registerQuery, 
+    createProjectQuery, 
+    joinProjectQuery, 
+    leaveProjectQuery, 
+    createSubSectionQuery, 
+    createNoteQuery,
+    deleteNoteQuery } from "../Utils/Queries";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
@@ -92,5 +101,31 @@ export const useMutations = () => {
         })
     )
 
-    return { deleteProjectMutation, loginMutation,createProjectMutation, registerMutation, joinProjectMutation, leaveProjectMutation, createSubSectionMutation, invalid }
+    const [createNoteMutation, setCreateNoteMutation] = useState(
+        useMutation(createNoteQuery, {
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
+
+    const [deleteNoteMutation, setDeleteNoteMutation] = useState(
+        useMutation(deleteNoteQuery, {
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
+    
+
+    return { deleteProjectMutation, 
+        loginMutation,
+        createProjectMutation,
+        registerMutation, 
+        joinProjectMutation, 
+        leaveProjectMutation, 
+        createSubSectionMutation, 
+        createNoteMutation,
+        deleteNoteMutation, 
+        invalid }
 }

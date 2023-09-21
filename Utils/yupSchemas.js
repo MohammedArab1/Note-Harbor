@@ -24,17 +24,8 @@ export const JoinProjectSchema = Yup.object().shape({
 export const createSubSectionSchema = Yup.object().shape({
   name: Yup.string().required("Sub Section name is required"),
   description: Yup.string(),
-  // dateToPickFrom: Yup.date().required("Date from is required")
-  // .typeError('you must specify a valid date'),
-  // dateToPickTo: Yup.date().required("Date to is required")
-  // .typeError('you must specify a valid date'),
-  // location: Yup.string(),
-  // minPplNeeded: Yup.number().required("Minimum people needed is required")
-  //   .typeError('you must specify a number')
-  //   .min(0, 'you must specify a number greater than 0'),
-  // numOfDatesToPick: Yup.number().required("Number of dates to pick is required")
-  //   .typeError('you must specify a number')
-  //   .min(0, 'you must specify a number greater than 0'),
-  // deadLine: Yup.date().required("Deadline is required")
-  //   .typeError('you must specify a valid date'),
 });
+
+export const createNoteSchema = Yup.object().shape({
+  content: Yup.string().required("Note content is required"),
+})

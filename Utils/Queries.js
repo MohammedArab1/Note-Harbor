@@ -99,9 +99,30 @@ export const createSubSectionQuery = (subSectionObject) => {
   )
 }
 
+export const createNoteQuery = (noteObject) => {
+  return axios.post(`${baseUrl}/note`, noteObject)
+  .then((res) => {
+    return res.data
+  })
+}
+
+export const deleteNoteQuery = (noteIds) => {
+  return axios.post(`${baseUrl}/note/deleteMany`, {noteIds:noteIds})
+  .then((res) => {
+    return res.data
+  })
+}
+
 //Done (hopefully), lots of changes in the ProjectDetails.jsx
 export const fetchSubSectionsPerProjectId = (projectId) => {
   return axios.get(`${baseUrl}/subsection/${projectId}`)
+  .then(
+    res => res.data
+  )
+}
+
+export const fetchNotesPerProjectId = (projectId) => {
+  return axios.get(`${baseUrl}/note/project/${projectId}`)
   .then(
     res => res.data
   )

@@ -1,6 +1,6 @@
 import { Button } from "@mui/material"
 import { useQuery} from "react-query"
-import { fetchProjectById, fetchSubSectionsPerProjectId } from "../../Utils/Queries"
+import { fetchNotesPerProjectId, fetchProjectById, fetchSubSectionsPerProjectId } from "../../Utils/Queries"
 import { useNavigate, useParams } from "react-router-dom"
 import { isUserLeader } from "../../Utils/Utils"
 import { useAuth } from "../../customHooks/useAuth"
@@ -8,15 +8,17 @@ import { useMutations } from "../../customHooks/useMutations"
 import { useState, useEffect } from "react"
 import ConfirmationPopup from "../assets/ConfirmationPopup"
 import { CreateSubSectionModal } from "../assets/CreateSubSectionModal"
+import { CreateNoteModal } from "../assets/CreateNoteModal"
 
 
 const ProjectDetails = () => {
-  const {deleteProjectMutation,invalid, leaveProjectMutation} = useMutations()
+  const {deleteProjectMutation,invalid, leaveProjectMutation, deleteNoteMutation} = useMutations()
   const {user} = useAuth()
   const {projectId} = useParams()
   const navigate = useNavigate()
   const [project, setProject] = useState(null)
   const [subSections, setSubSections] = useState([])
+  const [notes, setNotes] = useState([])
 
   const projectLeaderLeaveMessage = "Are you sure you want to leave this Project? Since you are the project leader, a random member will be appointed project leader after you leave."
   const projectLeaderDeleteMessage = "Are you sure you want to delete this project?"
@@ -30,10 +32,21 @@ const ProjectDetails = () => {
     leaveProjectMutation.mutate({projectId:newProject._id,newProject})
   }
 
+  const handleDeleteOneNote = (noteIdToBeDeleted)=>{
+    const newNotes = notes.filter(note => note._id !== noteIdToBeDeleted)
+    setNotes(newNotes)
+    deleteNoteMutation.mutate([noteIdToBeDeleted])
+  }
 
   const fetchProjectAndSubSections = async (projectId) => {
-    const [project, subsections] = await Promise.all([fetchProjectById(projectId), fetchSubSectionsPerProjectId(projectId)]);
-    return {project, subsections};
+    const [project, subsections, notes] = await Promise.all(
+      [
+        fetchProjectById(projectId), 
+        fetchSubSectionsPerProjectId(projectId), 
+        fetchNotesPerProjectId(projectId)
+      ]
+    );
+    return {project, subsections, notes};
   };
 
 
@@ -49,6 +62,7 @@ const ProjectDetails = () => {
       }
       setProject(data.project.project)
       setSubSections(data.subsections)
+      setNotes(data.notes)
     },
     onError: (error) => {
       navigate('/UserHome')
@@ -101,6 +115,18 @@ const ProjectDetails = () => {
       <ConfirmationPopup name="Leave project" message={projectLeaderLeaveMessage} onConfirm={() => handleLeaveProject(user.id)}></ConfirmationPopup> :
       <Button variant="text" type="button" onClick={() => handleLeaveProject(user.id)}>Leave project</Button> 
       }
+      <h2>Notes:</h2>
+      {notes.map((note,i) => {
+        return (
+        <div key={i}>
+          <h3>note {i+1}</h3>
+          <p>note content: {note.content}</p>
+          <p>note created by: {note.user.firstName + " "+ note.user.lastName}</p>
+          <p>note date created: {note.dateCreated}</p>
+          <Button variant="text" type="button" onClick={() => handleDeleteOneNote(note._id)}>delete this note</Button>
+        </div>)
+      })}
+      <CreateNoteModal notes={notes} setNotes={setNotes} projectId={projectId}></CreateNoteModal>
     </div>
   )
   }

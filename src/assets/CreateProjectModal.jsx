@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { TextField } from '@mui/material';
+import { TextField, FormControlLabel, Checkbox } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -36,8 +36,8 @@ export const CreateProjectModal = ({projects,setProjects}) => {
   const handleClose = () => setOpen(false);
 
   const handleCreateProject= async(data) => {
-    const {projectName, description} = data
-    createProjectMutation.mutate({projectName,description,isPrivate:true}, {
+    const {projectName, description, isPrivate} = data
+    createProjectMutation.mutate({projectName,description,isPrivate}, {
       onSuccess: (data) => {
         setProjects([...projects, data])
         setOpen(false)
@@ -75,6 +75,15 @@ export const CreateProjectModal = ({projects,setProjects}) => {
           label="Description"
           type="description"
           {...register("description")}
+        />
+        <br />
+        <FormControlLabel 
+          id='isPrivate' 
+          type="isPrivate" 
+          required 
+          control={<Checkbox defaultChecked />} 
+          label="Private" 
+          {...register("isPrivate")}
         />
         <h1>ADD A FIELD FOR ISPRIVATE. CURRENTLY JUST DEFAULTING TO TRUE TEMPORARILY.</h1>
         <Button variant="text" type="submit">Create project</Button>
