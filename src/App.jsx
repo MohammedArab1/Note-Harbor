@@ -7,7 +7,9 @@ import Register from './Authentication/Register';
 import Main from './Home';
 import UserHomePage from './userPages/UserHomePage';
 import ProjectDetails from './userPages/ProjectDetails';
+import SubSectionDetails from './userPages/SubSectionDetails';
 import { AuthContext } from '../context/AuthContext';
+import { AppDataContext } from '../context/AppDataContext';
 import NavigationBar from './Components/NavigationBar';
 import { Navigate } from 'react-router-dom';
 
@@ -15,9 +17,15 @@ const App = () => {
 
   const [user, setUser] = useState(null)
   const [invalid, setInvalid] = useState({isInvalid:false,message:""})
+  const [tags, setTags] = useState([])
+  const [sources, setSources] = useState([])
+  const [notes, setNotes] = useState([])
+  const [subSections, setSubSections] = useState([])
+
 
   return (
     <AuthContext.Provider value={{user, setUser, invalid, setInvalid}}>
+      <AppDataContext.Provider value={{tags, setTags, sources, setSources, notes, setNotes, subSections, setSubSections}}>
       <div>
         <NavigationBar/>
         <Routes>
@@ -30,10 +38,12 @@ const App = () => {
           <Route element={<PrivateRoutes/>}>
             <Route path='/UserHome' element={<UserHomePage />}/>
             <Route path='/ProjectDetails/:projectId' element={<ProjectDetails />}/>
+            <Route path='/ProjectDetails/:projectId/SubSectionDetails' element={<SubSectionDetails />}/>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+      </AppDataContext.Provider>
     </AuthContext.Provider>
   )
 }

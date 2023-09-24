@@ -106,12 +106,40 @@ export const createNoteQuery = (noteObject) => {
   })
 }
 
+export const createTagQuery = (tagObject) => {
+  return axios.post(`${baseUrl}/tag`, tagObject)
+  .then((res) => {
+    return res.data
+  })
+}
+
 export const deleteNoteQuery = (noteIds) => {
   return axios.post(`${baseUrl}/note/deleteMany`, {noteIds:noteIds})
   .then((res) => {
     return res.data
   })
 }
+
+export const deleteSubSectionQuery = (subSectionId) => {
+  return axios.delete(`${baseUrl}/subsection/${subSectionId}`)
+  .then(
+    res => res.data
+  )
+}
+
+export const deleteTagQuery = (tagId) => {
+  return axios.delete(`${baseUrl}/tag/${tagId}`)
+  .then(
+    res => res.data
+  )
+}
+
+// export const deleteProjectQuery = (projectId) => {
+//   return axios.delete(`${baseUrl}/project/${projectId}`)
+//   .then(
+//     res => res.data
+//   )
+// }
 
 //Done (hopefully), lots of changes in the ProjectDetails.jsx
 export const fetchSubSectionsPerProjectId = (projectId) => {
@@ -123,6 +151,20 @@ export const fetchSubSectionsPerProjectId = (projectId) => {
 
 export const fetchNotesPerProjectId = (projectId) => {
   return axios.get(`${baseUrl}/note/project/${projectId}`)
+  .then(
+    res => res.data
+  )
+}
+
+export const fetchTagsPerProjectId = (projectId) => {
+  return axios.get(`${baseUrl}/tag/project/${projectId}`)
+  .then(
+    res => res.data
+  )
+}
+
+export const fetchNotesPerSubSectionId = (subSectionId) => {
+  return axios.get(`${baseUrl}/note/subsection/${subSectionId}`)
   .then(
     res => res.data
   )

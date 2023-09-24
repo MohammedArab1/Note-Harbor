@@ -8,7 +8,10 @@ import {
     leaveProjectQuery, 
     createSubSectionQuery, 
     createNoteQuery,
-    deleteNoteQuery } from "../Utils/Queries";
+    deleteNoteQuery,
+    createTagQuery,
+    deleteSubSectionQuery,
+    deleteTagQuery } from "../Utils/Queries";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
@@ -108,9 +111,32 @@ export const useMutations = () => {
             }
         })
     )
+    const [createTagMutation, setCreateTagMutation] = useState(
+        useMutation(createTagQuery, {
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
 
     const [deleteNoteMutation, setDeleteNoteMutation] = useState(
         useMutation(deleteNoteQuery, {
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
+
+    const [deleteSubSectionMutation, setDeleteSubSectionMutation] = useState(
+        useMutation(deleteSubSectionQuery, {
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
+
+    const [deleteTagMutation, setDeleteTagMutation] = useState(
+        useMutation(deleteTagQuery, {
             onError: (error) => {
                 setInvalidError(setInvalid, error)
             }
@@ -126,6 +152,9 @@ export const useMutations = () => {
         leaveProjectMutation, 
         createSubSectionMutation, 
         createNoteMutation,
-        deleteNoteMutation, 
+        deleteNoteMutation,
+        createTagMutation, 
+        deleteSubSectionMutation,
+        deleteTagMutation,
         invalid }
 }

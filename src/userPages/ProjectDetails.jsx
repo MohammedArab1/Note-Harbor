@@ -1,24 +1,29 @@
 import { Button } from "@mui/material"
 import { useQuery} from "react-query"
-import { fetchNotesPerProjectId, fetchProjectById, fetchSubSectionsPerProjectId } from "../../Utils/Queries"
+import { fetchNotesPerProjectId, fetchProjectById, fetchSubSectionsPerProjectId, fetchTagsPerProjectId } from "../../Utils/Queries"
 import { useNavigate, useParams } from "react-router-dom"
 import { isUserLeader } from "../../Utils/Utils"
 import { useAuth } from "../../customHooks/useAuth"
 import { useMutations } from "../../customHooks/useMutations"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import ConfirmationPopup from "../assets/ConfirmationPopup"
 import { CreateSubSectionModal } from "../assets/CreateSubSectionModal"
 import { CreateNoteModal } from "../assets/CreateNoteModal"
+import { CreateTagModal } from "../assets/CreateTagModal"
+import CircleIcon from '@mui/icons-material/Circle';
+import { AppDataContext } from "../../context/AppDataContext"
 
 
 const ProjectDetails = () => {
-  const {deleteProjectMutation,invalid, leaveProjectMutation, deleteNoteMutation} = useMutations()
+  const { tags, setTags } = useContext(AppDataContext)
+  const {deleteProjectMutation,invalid, leaveProjectMutation, deleteNoteMutation, deleteSubSectionMutation, deleteTagMutation} = useMutations()
   const {user} = useAuth()
   const {projectId} = useParams()
   const navigate = useNavigate()
   const [project, setProject] = useState(null)
   const [subSections, setSubSections] = useState([])
   const [notes, setNotes] = useState([])
+  // const [tags, setTags] = useState([])
 
   const projectLeaderLeaveMessage = "Are you sure you want to leave this Project? Since you are the project leader, a random member will be appointed project leader after you leave."
   const projectLeaderDeleteMessage = "Are you sure you want to delete this project?"
@@ -32,24 +37,44 @@ const ProjectDetails = () => {
     leaveProjectMutation.mutate({projectId:newProject._id,newProject})
   }
 
+  const handleVisitSubSectionDetailPage = (subSection) => {
+    navigate(`/ProjectDetails/${projectId}/SubSectionDetails`, {state: {subSection}})
+  }
+
   const handleDeleteOneNote = (noteIdToBeDeleted)=>{
     const newNotes = notes.filter(note => note._id !== noteIdToBeDeleted)
+    //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state. (pretty sure tehre's an onSuccess for mutations)
     setNotes(newNotes)
     deleteNoteMutation.mutate([noteIdToBeDeleted])
   }
 
+  const handleDeleteOneSubSection = (subSectionIdToBeDeleted) => {
+    const newSubSections = subSections.filter(subSection => subSection._id !== subSectionIdToBeDeleted)
+    //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state. 
+    //(pretty sure tehre's an onSuccess for mutations) (there is, check useMutations.js)
+    setSubSections(newSubSections)
+    deleteSubSectionMutation.mutate(subSectionIdToBeDeleted)
+  }
+
+  const handleDeleteOneTag = (tagIdToBeDeleted) => {
+    const newTags = tags.filter(tag => tag._id !== tagIdToBeDeleted)
+    //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state. 
+    //(pretty sure tehre's an onSuccess for mutations) (there is, check useMutations.js)
+    setTags(newTags)
+    deleteTagMutation.mutate(tagIdToBeDeleted)
+  }
+
   const fetchProjectAndSubSections = async (projectId) => {
-    const [project, subsections, notes] = await Promise.all(
+    const [project, subsections, notes, tags] = await Promise.all(
       [
         fetchProjectById(projectId), 
         fetchSubSectionsPerProjectId(projectId), 
-        fetchNotesPerProjectId(projectId)
+        fetchNotesPerProjectId(projectId),
+        fetchTagsPerProjectId(projectId)
       ]
     );
-    return {project, subsections, notes};
+    return {project, subsections, notes, tags};
   };
-
-
   const {error,data, isFetching} = useQuery('projects',() => fetchProjectAndSubSections(projectId),{
     onSuccess: (data) => {
       if (data.project.project===null) {
@@ -63,6 +88,7 @@ const ProjectDetails = () => {
       setProject(data.project.project)
       setSubSections(data.subsections)
       setNotes(data.notes)
+      setTags(data.tags.tags)
     },
     onError: (error) => {
       navigate('/UserHome')
@@ -101,20 +127,21 @@ const ProjectDetails = () => {
       <h2>SubSections:</h2>
       {subSections.map((subsection,i) => {
         return (
-        <div key={i}>
-          <h3>subsection {i+1}</h3>
-          <p>subsection name: {subsection.name}</p>
-          <p>subsection description: {subsection.description}</p>
-        </div>)
-      })}
+          <div key={i}>
+            <h3>subsection {i+1}</h3>
+            <p>subsection name: {subsection.name}</p>
+            <p>subsection description: {subsection.description}</p>
+            <Button variant="text" type="button" onClick={() => handleVisitSubSectionDetailPage(subsection)}>go to subSection detail page</Button>
+            <ConfirmationPopup 
+              name="Delete SubSection" 
+              message={"Are you sure you want to delete subsection? All notes associated with this subsection will be deleted"}
+              onConfirm={() => handleDeleteOneSubSection(subsection._id)}>
+            </ConfirmationPopup>
+            {/* <Button variant="text" type="button" onClick={() => handleDeleteOneSubSection(subsection._id)}>Delete subsection</Button> */}
+          </div>)
+        })}
       { isUserLeader(project.leader._id) && <CreateSubSectionModal subSections={subSections} setSubSections={setSubSections} projectId={projectId}></CreateSubSectionModal>}
-      { isUserLeader(project.leader._id) && <ConfirmationPopup name="Delete project" message={projectLeaderDeleteMessage} onConfirm={() => deleteProjectMutation.mutate(projectId)}></ConfirmationPopup>}
-      <button onClick={() => navigate(-1)}>go back</button>
-      <br/>
-      { isUserLeader(project.leader._id) ?  
-      <ConfirmationPopup name="Leave project" message={projectLeaderLeaveMessage} onConfirm={() => handleLeaveProject(user.id)}></ConfirmationPopup> :
-      <Button variant="text" type="button" onClick={() => handleLeaveProject(user.id)}>Leave project</Button> 
-      }
+      <p>---------------------------------------------------------------</p>
       <h2>Notes:</h2>
       {notes.map((note,i) => {
         return (
@@ -127,6 +154,31 @@ const ProjectDetails = () => {
         </div>)
       })}
       <CreateNoteModal notes={notes} setNotes={setNotes} projectId={projectId}></CreateNoteModal>
+      <p>---------------------------------------------------------------</p>
+      <h2>Tags:</h2>
+      {tags.map((tag,i) => {
+        return (
+        <div key={i}>
+          <h3>tag {i+1}</h3>
+          <p>tag name: {tag.tagName}</p>
+          <p>tag id: {tag._id}</p>
+          <p>tag colour: {<CircleIcon style={{ color: tag.colour }} fontSize='large'/>}</p>
+          <ConfirmationPopup 
+              name="Delete tag" 
+              message={"Are you sure you want to delete this tag? Notes will no longer be tagged with this tag"}
+              onConfirm={() => handleDeleteOneTag(tag._id)}>
+            </ConfirmationPopup>
+        </div>)
+      })}
+      <CreateTagModal tags={tags} setTags={setTags} projectId={projectId}/>
+      <p>---------------------------------------------------------------</p>
+      { isUserLeader(project.leader._id) && <ConfirmationPopup name="Delete project" message={projectLeaderDeleteMessage} onConfirm={() => deleteProjectMutation.mutate(projectId)}></ConfirmationPopup>}
+      <button onClick={() => navigate(-1)}>go back</button>
+      <br/>
+      { isUserLeader(project.leader._id) ?  
+      <ConfirmationPopup name="Leave project" message={projectLeaderLeaveMessage} onConfirm={() => handleLeaveProject(user.id)}></ConfirmationPopup> :
+      <Button variant="text" type="button" onClick={() => handleLeaveProject(user.id)}>Leave project</Button> 
+      }
     </div>
   )
   }

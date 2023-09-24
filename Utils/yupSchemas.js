@@ -29,3 +29,7 @@ export const createSubSectionSchema = Yup.object().shape({
 export const createNoteSchema = Yup.object().shape({
   content: Yup.string().required("Note content is required"),
 })
+
+export const createTagSchema = Yup.object().shape({
+  tagName: Yup.string().required("Tag name is required"),
+})
