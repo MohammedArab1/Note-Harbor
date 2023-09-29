@@ -1,6 +1,6 @@
 import { Button } from "@mui/material"
 import { useQuery} from "react-query"
-import { fetchNotesPerProjectId, fetchProjectById, fetchSubSectionsPerProjectId, fetchTagsPerProjectId } from "../../Utils/Queries"
+import { fetchNotesPerProjectId, fetchProjectById, fetchSubSectionsPerProjectId, fetchTagsPerProjectId, fetchUniqueSourcesPerProjectId } from "../../Utils/Queries"
 import { useNavigate, useParams } from "react-router-dom"
 import { isUserLeader } from "../../Utils/Utils"
 import { useAuth } from "../../customHooks/useAuth"
@@ -12,19 +12,18 @@ import { CreateNoteModal } from "../assets/CreateNoteModal"
 import { CreateTagModal } from "../assets/CreateTagModal"
 import CircleIcon from '@mui/icons-material/Circle';
 import { AppDataContext } from "../../context/AppDataContext"
+import { CreateSourceModal } from "../assets/CreateSourceModal"
 
 
 const ProjectDetails = () => {
-  const { tags, setTags } = useContext(AppDataContext)
-  const {deleteProjectMutation,invalid, leaveProjectMutation, deleteNoteMutation, deleteSubSectionMutation, deleteTagMutation} = useMutations()
+  const { tags, setTags, sources, setSources } = useContext(AppDataContext)
+  const {deleteProjectMutation,invalid, leaveProjectMutation, deleteNoteMutation, deleteSubSectionMutation, deleteTagMutation, deleteUniqueSourceMutation} = useMutations()
   const {user} = useAuth()
   const {projectId} = useParams()
   const navigate = useNavigate()
   const [project, setProject] = useState(null)
   const [subSections, setSubSections] = useState([])
   const [notes, setNotes] = useState([])
-  // const [tags, setTags] = useState([])
-
   const projectLeaderLeaveMessage = "Are you sure you want to leave this Project? Since you are the project leader, a random member will be appointed project leader after you leave."
   const projectLeaderDeleteMessage = "Are you sure you want to delete this project?"
 
@@ -44,7 +43,9 @@ const ProjectDetails = () => {
   const handleDeleteOneNote = (noteIdToBeDeleted)=>{
     const newNotes = notes.filter(note => note._id !== noteIdToBeDeleted)
     //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state. (pretty sure tehre's an onSuccess for mutations)
+    //not sure you need to setNotes anymore since you're now just refreshing the page.
     setNotes(newNotes)
+    navigate(0)
     deleteNoteMutation.mutate([noteIdToBeDeleted])
   }
 
@@ -64,16 +65,25 @@ const ProjectDetails = () => {
     deleteTagMutation.mutate(tagIdToBeDeleted)
   }
 
+  const handleDeleteUniqueSource = (projectId,source) => {
+    const newSources = sources.filter(sourceItem => sourceItem !== source)
+    //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state. 
+    //(pretty sure tehre's an onSuccess for mutations) (there is, check useMutations.js)
+    setSources(newSources)
+    deleteUniqueSourceMutation.mutate({projectId, source})
+  }
+
   const fetchProjectAndSubSections = async (projectId) => {
-    const [project, subsections, notes, tags] = await Promise.all(
+    const [project, subsections, notes, tags, sources] = await Promise.all(
       [
         fetchProjectById(projectId), 
         fetchSubSectionsPerProjectId(projectId), 
         fetchNotesPerProjectId(projectId),
-        fetchTagsPerProjectId(projectId)
+        fetchTagsPerProjectId(projectId),
+        fetchUniqueSourcesPerProjectId(projectId)
       ]
     );
-    return {project, subsections, notes, tags};
+    return {project, subsections, notes, tags, sources};
   };
   const {error,data, isFetching} = useQuery('projects',() => fetchProjectAndSubSections(projectId),{
     onSuccess: (data) => {
@@ -89,6 +99,7 @@ const ProjectDetails = () => {
       setSubSections(data.subsections)
       setNotes(data.notes)
       setTags(data.tags.tags)
+      setSources(data.sources.uniqueSources)
     },
     onError: (error) => {
       navigate('/UserHome')
@@ -137,7 +148,6 @@ const ProjectDetails = () => {
               message={"Are you sure you want to delete subsection? All notes associated with this subsection will be deleted"}
               onConfirm={() => handleDeleteOneSubSection(subsection._id)}>
             </ConfirmationPopup>
-            {/* <Button variant="text" type="button" onClick={() => handleDeleteOneSubSection(subsection._id)}>Delete subsection</Button> */}
           </div>)
         })}
       { isUserLeader(project.leader._id) && <CreateSubSectionModal subSections={subSections} setSubSections={setSubSections} projectId={projectId}></CreateSubSectionModal>}
@@ -171,6 +181,22 @@ const ProjectDetails = () => {
         </div>)
       })}
       <CreateTagModal tags={tags} setTags={setTags} projectId={projectId}/>
+      <p>---------------------------------------------------------------</p>
+      <h2>Unique Sources:</h2>
+      {
+        sources.map((source,i) => {
+          return (
+          <div key={i}>
+            <h3>source {i+1}</h3>
+            <p>source name: {source}</p>
+            <ConfirmationPopup 
+              name="Delete source" 
+              message={"Are you sure you want to delete this source? Notes will no longer be sourced with this source"}
+              onConfirm={() => handleDeleteUniqueSource(projectId,source)}>
+            </ConfirmationPopup>
+          </div>)
+      })}
+      <CreateSourceModal sources={sources} setSources={setSources} projectId={projectId}/>
       <p>---------------------------------------------------------------</p>
       { isUserLeader(project.leader._id) && <ConfirmationPopup name="Delete project" message={projectLeaderDeleteMessage} onConfirm={() => deleteProjectMutation.mutate(projectId)}></ConfirmationPopup>}
       <button onClick={() => navigate(-1)}>go back</button>

@@ -33,3 +33,7 @@ export const createNoteSchema = Yup.object().shape({
 export const createTagSchema = Yup.object().shape({
   tagName: Yup.string().required("Tag name is required"),
 })
+
+export const createSourceSchema = Yup.object().shape({
+  source: Yup.string().required("Source is required"),
+})

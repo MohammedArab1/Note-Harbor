@@ -85,7 +85,6 @@ export const CreateProjectModal = ({projects,setProjects}) => {
           label="Private" 
           {...register("isPrivate")}
         />
-        <h1>ADD A FIELD FOR ISPRIVATE. CURRENTLY JUST DEFAULTING TO TRUE TEMPORARILY.</h1>
         <Button variant="text" type="submit">Create project</Button>
         </Box>
       </Modal>
