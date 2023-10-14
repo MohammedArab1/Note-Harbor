@@ -12,8 +12,8 @@ import {
     createTagQuery,
     deleteSubSectionQuery,
     deleteTagQuery,
-    createSourceQuery,
-    deleteUniqueSourceQuery } from "../Utils/Queries";
+    createSourceQuery, //to remove
+    deleteUniqueSourceQuery  } from "../Utils/Queries"; //to remove
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
@@ -120,7 +120,7 @@ export const useMutations = () => {
             }
         })
     )
-
+    //to be removed
     const [createSourceMutation, setCreateSourceMutation] = useState(
         useMutation(createSourceQuery, {
             onError: (error) => {
@@ -152,7 +152,7 @@ export const useMutations = () => {
             }
         })
     )
-
+    //to be removed
     const [deleteUniqueSourceMutation, setDeleteUniqueSourceMutation] = useState(
         useMutation(deleteUniqueSourceQuery, {
             onError: (error) => {
@@ -174,7 +174,7 @@ export const useMutations = () => {
         createTagMutation, 
         deleteSubSectionMutation,
         deleteTagMutation,
-        createSourceMutation,
-        deleteUniqueSourceMutation,
+        createSourceMutation, //to be removed
+        deleteUniqueSourceMutation, //to be removed
         invalid }
 }

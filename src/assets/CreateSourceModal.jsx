@@ -9,7 +9,7 @@ import { createSourceSchema } from '../../Utils/yupSchemas';
 import { useMutations } from '../../customHooks/useMutations';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-
+//to be removed. This whole component is not used anymore as source now needs to be associated with a note.
 export const CreateSourceModal = ({projectId, sources, setSources}) => {
 
   const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));

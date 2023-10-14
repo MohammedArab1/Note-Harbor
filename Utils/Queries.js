@@ -112,7 +112,7 @@ export const createTagQuery = (tagObject) => {
     return res.data
   })
 }
-
+//to be removed
 export const createSourceQuery = (sourceObject) => {
   return axios.post(`${baseUrl}/source`, sourceObject)
   .then((res) => {
@@ -169,9 +169,8 @@ export const fetchTagsPerProjectId = (projectId) => {
     res => res.data
   )
 }
-
+//to be removed
 export const fetchUniqueSourcesPerProjectId = (projectId) => {
-  console.log("calling fetch unique sources with project id: ", projectId)
   return axios.get(`${baseUrl}/source/project/${projectId}/unique`)
   .then(
     res => res.data
@@ -185,6 +184,13 @@ export const fetchNotesPerSubSectionId = (subSectionId) => {
   )
 }
 
+export const fetchAllNotesForProject = (projectId,subsectionIds) => {
+  return axios.post(`${baseUrl}/note/allNotes`,{projectId,subsectionIds})
+  .then(
+    res => res.data
+  )
+}
+//to be removed
 export const deleteUniqueSourceQuery = ({projectId, source}) => {
   return axios.post(`${baseUrl}/source/deleteUnique`, {projectId, source})
   .then((res) => {

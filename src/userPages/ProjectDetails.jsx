@@ -1,6 +1,6 @@
 import { Button } from "@mui/material"
 import { useQuery} from "react-query"
-import { fetchNotesPerProjectId, fetchProjectById, fetchSubSectionsPerProjectId, fetchTagsPerProjectId, fetchUniqueSourcesPerProjectId } from "../../Utils/Queries"
+import { fetchNotesPerProjectId, fetchProjectById, fetchSubSectionsPerProjectId, fetchTagsPerProjectId, fetchAllNotesForProject  } from "../../Utils/Queries"
 import { useNavigate, useParams } from "react-router-dom"
 import { isUserLeader } from "../../Utils/Utils"
 import { useAuth } from "../../customHooks/useAuth"
@@ -16,14 +16,14 @@ import { CreateSourceModal } from "../assets/CreateSourceModal"
 
 
 const ProjectDetails = () => {
-  const { tags, setTags, sources, setSources } = useContext(AppDataContext)
+  const { tags, setTags, uniqueSources, setUniqueSources, allProjectNotes, setAllProjectNotes } = useContext(AppDataContext)
   const {deleteProjectMutation,invalid, leaveProjectMutation, deleteNoteMutation, deleteSubSectionMutation, deleteTagMutation, deleteUniqueSourceMutation} = useMutations()
   const {user} = useAuth()
   const {projectId} = useParams()
   const navigate = useNavigate()
   const [project, setProject] = useState(null)
   const [subSections, setSubSections] = useState([])
-  const [notes, setNotes] = useState([])
+  const [notes, setNotes] = useState(null)
   const projectLeaderLeaveMessage = "Are you sure you want to leave this Project? Since you are the project leader, a random member will be appointed project leader after you leave."
   const projectLeaderDeleteMessage = "Are you sure you want to delete this project?"
 
@@ -65,27 +65,28 @@ const ProjectDetails = () => {
     deleteTagMutation.mutate(tagIdToBeDeleted)
   }
 
-  const handleDeleteUniqueSource = (projectId,source) => {
-    const newSources = sources.filter(sourceItem => sourceItem !== source)
-    //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state. 
-    //(pretty sure tehre's an onSuccess for mutations) (there is, check useMutations.js)
-    setSources(newSources)
-    deleteUniqueSourceMutation.mutate({projectId, source})
-  }
+  // const handleDeleteUniqueSource = (projectId,source) => {
+  //   const newSources = sources.filter(sourceItem => sourceItem !== source)
+  //   //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state. 
+  //   //(pretty sure tehre's an onSuccess for mutations) (there is, check useMutations.js)
+  //   setSources(newSources)
+  //   deleteUniqueSourceMutation.mutate({projectId, source})
+  // }
 
   const fetchProjectAndSubSections = async (projectId) => {
-    const [project, subsections, notes, tags, sources] = await Promise.all(
+    const [project, subsections, tags] = await Promise.all(
       [
         fetchProjectById(projectId), 
         fetchSubSectionsPerProjectId(projectId), 
-        fetchNotesPerProjectId(projectId),
+        // fetchNotesPerProjectId(projectId),
         fetchTagsPerProjectId(projectId),
-        fetchUniqueSourcesPerProjectId(projectId)
+        // fetchUniqueSourcesPerProjectId(projectId)
       ]
     );
-    return {project, subsections, notes, tags, sources};
+    return {project, subsections, tags};
   };
-  const {error,data, isFetching} = useQuery('projects',() => fetchProjectAndSubSections(projectId),{
+  //todo error and isFetching should be in the next useQuery not this one
+  const {error, isFetching,data} = useQuery('projects',() => fetchProjectAndSubSections(projectId),{
     onSuccess: (data) => {
       if (data.project.project===null) {
         return navigate('/UserHome')
@@ -97,15 +98,37 @@ const ProjectDetails = () => {
       }
       setProject(data.project.project)
       setSubSections(data.subsections)
-      setNotes(data.notes)
+      // setNotes(data.notes)
       setTags(data.tags.tags)
-      setSources(data.sources.uniqueSources)
+      //to be removed, getting the unique sources is done by looking at all the sources for each note and getting the unique ones (in the frontend)
+      //this would also mean that you'd need to update the unique sources everytime a note is created or deleted.
+      //and also that in the lines above you'd need to fetch all notes, even for subsections that are not currently being viewed.
+      // setSources(data.sources.uniqueSources)
     },
     onError: (error) => {
       navigate('/UserHome')
     },
     retry: false,
-    // refetchOnReconnect: 'always'
+  })
+  const {} = useQuery('fetchAllNotes',() => fetchAllNotesForProject(projectId,subSections.map((x)=>{return x._id})),{
+    onSuccess: (data) => {
+      const allSources = data.reduce((accumulator, note) => {
+        return accumulator.concat(note.sources);
+      }, []);
+      const uniqueSources = allSources.filter((source, index, self) =>
+          index === self.findIndex((t) => (
+              t.source === source.source
+          ))
+      );
+      setAllProjectNotes(data)
+      setNotes(data.filter((x)=>{return x.project!=null}))
+      setUniqueSources(uniqueSources)
+    },
+    onError: (error) => {
+      navigate('/UserHome')
+    },
+    retry: false,
+    enabled: !(subSections.length==0)
   })
 
   if (error) return <p>error</p>
@@ -152,14 +175,53 @@ const ProjectDetails = () => {
         })}
       { isUserLeader(project.leader._id) && <CreateSubSectionModal subSections={subSections} setSubSections={setSubSections} projectId={projectId}></CreateSubSectionModal>}
       <p>---------------------------------------------------------------</p>
-      <h2>Notes:</h2>
-      {notes.map((note,i) => {
+      <h2>All Application Notes:</h2>
+      {allProjectNotes?.map((note,i) => {
         return (
         <div key={i}>
           <h3>note {i+1}</h3>
           <p>note content: {note.content}</p>
           <p>note created by: {note.user.firstName + " "+ note.user.lastName}</p>
           <p>note date created: {note.dateCreated}</p>
+          <p>sources for this note:</p>
+          <ol>
+            {
+              note.sources.map((source,i)=>{
+                return(
+                <li key={i}>
+                  <p>source name: {source.source}</p>
+                  <p>source additional information: {source.additionalSourceInformation}</p>
+                </li>
+                )
+              })
+            }
+          </ol>
+          <Button variant="text" type="button" onClick={() => handleDeleteOneNote(note._id)}>delete this note</Button>
+        </div>)
+      })}
+      <CreateNoteModal notes={notes} setNotes={setNotes} projectId={projectId}></CreateNoteModal>
+      <p>---------------------------------------------------------------</p>
+      <h2>Notes associated only with this project (not with any subsection)</h2>
+      {notes?.map((note,i) => {
+        return (
+        <div key={i}>
+          <h3>note {i+1}</h3>
+          <p>note content: {note.content}</p>
+          <p>note created by: {note.user.firstName + " "+ note.user.lastName}</p>
+          <p>note date created: {note.dateCreated}</p>
+          <p>sources for this note:</p>
+          <ol>
+            {
+              note.sources.map((source,i)=>{
+                return(
+                <li key={i}>
+                  <p>source name: {source.source}</p>
+                  <p>source additional information: {source.additionalSourceInformation}</p>
+                </li>
+                )
+              })
+            }
+          </ol>
           <Button variant="text" type="button" onClick={() => handleDeleteOneNote(note._id)}>delete this note</Button>
         </div>)
       })}
@@ -184,19 +246,19 @@ const ProjectDetails = () => {
       <p>---------------------------------------------------------------</p>
       <h2>Unique Sources:</h2>
       {
-        sources.map((source,i) => {
+        uniqueSources.map((source,i) => {
           return (
           <div key={i}>
             <h3>source {i+1}</h3>
-            <p>source name: {source}</p>
-            <ConfirmationPopup 
+            <p>source name: {source.source}</p>
+            {/* <ConfirmationPopup 
               name="Delete source" 
               message={"Are you sure you want to delete this source? Notes will no longer be sourced with this source"}
               onConfirm={() => handleDeleteUniqueSource(projectId,source)}>
-            </ConfirmationPopup>
+            </ConfirmationPopup> */}
           </div>)
       })}
-      <CreateSourceModal sources={sources} setSources={setSources} projectId={projectId}/>
+      {/* <CreateSourceModal sources={sources} setSources={setSources} projectId={projectId}/> */}
       <p>---------------------------------------------------------------</p>
       { isUserLeader(project.leader._id) && <ConfirmationPopup name="Delete project" message={projectLeaderDeleteMessage} onConfirm={() => deleteProjectMutation.mutate(projectId)}></ConfirmationPopup>}
       <button onClick={() => navigate(-1)}>go back</button>

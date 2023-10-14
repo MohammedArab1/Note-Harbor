@@ -18,14 +18,15 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [invalid, setInvalid] = useState({isInvalid:false,message:""})
   const [tags, setTags] = useState([])
-  const [sources, setSources] = useState([])
+  const [uniqueSources, setUniqueSources] = useState([])
   const [notes, setNotes] = useState([])
+  const [allProjectNotes, setAllProjectNotes] = useState([])
   const [subSections, setSubSections] = useState([])
 
 
   return (
     <AuthContext.Provider value={{user, setUser, invalid, setInvalid}}>
-      <AppDataContext.Provider value={{tags, setTags, sources, setSources, notes, setNotes, subSections, setSubSections}}>
+      <AppDataContext.Provider value={{tags, setTags, uniqueSources, setUniqueSources, notes, setNotes, allProjectNotes, setAllProjectNotes, subSections, setSubSections}}>
       <div>
         <NavigationBar/>
         <Routes>

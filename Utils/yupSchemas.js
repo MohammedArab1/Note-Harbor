@@ -28,6 +28,11 @@ export const createSubSectionSchema = Yup.object().shape({
 
 export const createNoteSchema = Yup.object().shape({
   content: Yup.string().required("Note content is required"),
+  addSource: Yup.boolean(),
+  source: Yup.string().when("addSource", {
+    is: true,
+    then: () => Yup.string().required("Source is required"),
+  }),
 })
 
 export const createTagSchema = Yup.object().shape({

@@ -12,8 +12,7 @@ import { AppDataContext } from '../../context/AppDataContext';
 
 
 export const CreateNoteModal = ({notes,setNotes, projectId,subSectionId}) => {
-  const { sources, setSources } = React.useContext(AppDataContext)
-  console.log("sources are: ", sources)
+  const { uniqueSources, setUniqueSources, allProjectNotes, setAllProjectNotes } = React.useContext(AppDataContext)
   const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const style = {
     position: 'absolute',
@@ -26,7 +25,7 @@ export const CreateNoteModal = ({notes,setNotes, projectId,subSectionId}) => {
     boxShadow: 24,
     p: 4,
   };
-  const {createNoteMutation, createSourceMutation,invalid} = useMutations()
+  const {createNoteMutation,invalid} = useMutations()
   const {register, handleSubmit, formState:{errors}, setValue, control} = useForm({
     resolver:yupResolver(createNoteSchema) 
   })
@@ -42,21 +41,15 @@ export const CreateNoteModal = ({notes,setNotes, projectId,subSectionId}) => {
 
   const handleCreateNote= async(data) => {
     const {content} = data
-    console.log("data content is:",content, "data user source input is: ", userSourceInput)
-    createNoteMutation.mutate({content, projectId:projectId||null, subSectionId:subSectionId||null}, {
+    createNoteMutation.mutate({content, projectId:projectId||null, subSectionId:subSectionId||null, sources:userSourceInput?[{source:userSourceInput}]:[]}, {
       onSuccess: (data) => {
-        if (userSourceInput != '') {
-          createSourceMutation.mutate({source:userSourceInput, project:projectId, additionalSourceInformation:"toBeAddedInFrontend",note:data._id }, {
-            onSuccess: (data) => {
-              if (!sources.includes(data.source)) {
-                  setSources([...sources, data.source]);
-              }        
-            }
-          })
-        }
+        if(data.sources.length != 0){setUniqueSources([...uniqueSources, ...data.sources]);}
         setNotes([...notes, data])
+        setAllProjectNotes([...allProjectNotes, data])
         setOpen(false)
         setValue("content", "")
+        setValue("source", "")
+        setAddSource(false)
       }
     })
   }
@@ -83,33 +76,13 @@ export const CreateNoteModal = ({notes,setNotes, projectId,subSectionId}) => {
                 {...register("content")}
                 />
                 <br />
-                <FormControlLabel control={<Checkbox checked={addSource} onChange={handleAddSource}/>} label="Add Source" />
+                <FormControlLabel control={<Checkbox checked={addSource} {...register("addSource")} onChange={handleAddSource}/>} label="Add Source" />
                 {addSource && 
-                  //   <TextField
-                  //   select
-                  //   fullWidth
-                  //   label="Select Source"
-                  //   defaultValue={sources[0]}
-                    // inputProps={register('select_source', {
-                    //   required: 'Please enter source',
-                    // })}
-                  //   error={errors.select_source}
-                  //   helperText={errors.select_source?.message}
-                  // >
-                  //   {sources.map((source,i) => (
-                  //     <MenuItem key={i} value={source}>
-                  //       {source}
-                  //     </MenuItem>
-                  //   ))}
-                  // </TextField>
-
-
-
                   <Autocomplete
                     freeSolo
-                    id="free-solo-2-demo"
+                    id="source"
                     disableClearable
-                    options={sources}
+                    options={uniqueSources.map((source) => source.source)}
                     onInputChange={(event, newValue) => {
                       setUserSourceInput(newValue);
                     }}
@@ -117,28 +90,18 @@ export const CreateNoteModal = ({notes,setNotes, projectId,subSectionId}) => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Search input"
+                        label="Source"
                         InputProps={{
                           ...params.InputProps,
                           type: 'search',
                         }}
-                        // inputProps={register('select_source', {
-                        //   required: 'Please enter source',
-                        // })}
+                        required
+                        error={errors.source ? true : false}
+                        helperText={errors.source?.message}
+                        {...register("source")}
                       />
                     )}
                   />
-
-                  // <ControlledAutocomplete
-                  //     control={control}
-                  //     name="Source"
-                  //     options={sources}
-                  //     onChange={(data) => console.log(data)}
-                  //     getOptionLabel={(option) => `${option}`}
-                  //     renderInput={(params) => <TextField {...params} label="My label" margin="normal" />}
-                  //     defaultValue={null}
-                  // />
-
                 }
                 <br />
                 <Button variant="text" type="submit">Create Note</Button>
