@@ -176,7 +176,7 @@ export const fetchUniqueSourcesPerProjectId = (projectId) => {
     res => res.data
   )
 }
-
+//to be removed
 export const fetchNotesPerSubSectionId = (subSectionId) => {
   return axios.get(`${baseUrl}/note/subsection/${subSectionId}`)
   .then(

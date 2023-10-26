@@ -12,21 +12,21 @@ import { AuthContext } from '../context/AuthContext';
 import { AppDataContext } from '../context/AppDataContext';
 import NavigationBar from './Components/NavigationBar';
 import { Navigate } from 'react-router-dom';
+import FetchProjectDetails from './assets/FetchProjectDetails';
 
 const App = () => {
 
   const [user, setUser] = useState(null)
   const [invalid, setInvalid] = useState({isInvalid:false,message:""})
+  const [project, setProject] = useState(null)
   const [tags, setTags] = useState([])
-  const [uniqueSources, setUniqueSources] = useState([])
-  const [notes, setNotes] = useState([])
   const [allProjectNotes, setAllProjectNotes] = useState([])
   const [subSections, setSubSections] = useState([])
 
 
   return (
     <AuthContext.Provider value={{user, setUser, invalid, setInvalid}}>
-      <AppDataContext.Provider value={{tags, setTags, uniqueSources, setUniqueSources, notes, setNotes, allProjectNotes, setAllProjectNotes, subSections, setSubSections}}>
+      <AppDataContext.Provider value={{tags, setTags, allProjectNotes, setAllProjectNotes, subSections, setSubSections, project, setProject}}>
       <div>
         <NavigationBar/>
         <Routes>
@@ -38,8 +38,10 @@ const App = () => {
 
           <Route element={<PrivateRoutes/>}>
             <Route path='/UserHome' element={<UserHomePage />}/>
-            <Route path='/ProjectDetails/:projectId' element={<ProjectDetails />}/>
-            <Route path='/ProjectDetails/:projectId/SubSectionDetails' element={<SubSectionDetails />}/>
+            <Route element={<FetchProjectDetails/>}>
+              <Route path='/ProjectDetails/:projectId' element={<ProjectDetails />}/>
+              <Route path='/ProjectDetails/:projectId/SubSectionDetails/:subSectionId' element={<SubSectionDetails />}/>  
+            </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

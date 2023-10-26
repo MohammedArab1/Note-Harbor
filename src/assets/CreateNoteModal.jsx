@@ -1,18 +1,17 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { TextField, FormControlLabel, Checkbox, Select, MenuItem, InputLabel, FormControl, Autocomplete } from '@mui/material';
+import { TextField, FormControlLabel, Checkbox, Autocomplete } from '@mui/material';
 import Modal from '@mui/material/Modal';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createNoteSchema } from '../../Utils/yupSchemas';
 import { useMutations } from '../../customHooks/useMutations';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { AppDataContext } from '../../context/AppDataContext';
 
-
-export const CreateNoteModal = ({notes,setNotes, projectId,subSectionId}) => {
-  const { uniqueSources, setUniqueSources, allProjectNotes, setAllProjectNotes } = React.useContext(AppDataContext)
+export const CreateNoteModal = ({projectId,subSectionId}) => {
+  const { allProjectNotes, setAllProjectNotes } = React.useContext(AppDataContext)
   const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const style = {
     position: 'absolute',
@@ -30,21 +29,32 @@ export const CreateNoteModal = ({notes,setNotes, projectId,subSectionId}) => {
     resolver:yupResolver(createNoteSchema) 
   })
   const [open, setOpen] = React.useState(false);
+  const [uniqueSources, setUniqueSources] = React.useState([])
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [addSource, setAddSource] = React.useState(false)
   const [userSourceInput, setUserSourceInput] = React.useState('')
-
   const handleAddSource = () => {
     setAddSource(!addSource)
   }
+
+  React.useEffect(() => {
+    const allSources = allProjectNotes.reduce((accumulator, note) => {
+      return accumulator.concat(note.sources);
+    }, []);
+    const calculatedUniqueSources = allSources.filter((source, index, self) =>  
+      index === self.findIndex((t) => (
+            t.source === source.source
+        ))
+    );
+    setUniqueSources(calculatedUniqueSources)
+  }, [allProjectNotes])
+  
 
   const handleCreateNote= async(data) => {
     const {content} = data
     createNoteMutation.mutate({content, projectId:projectId||null, subSectionId:subSectionId||null, sources:userSourceInput?[{source:userSourceInput}]:[]}, {
       onSuccess: (data) => {
-        if(data.sources.length != 0){setUniqueSources([...uniqueSources, ...data.sources]);}
-        setNotes([...notes, data])
         setAllProjectNotes([...allProjectNotes, data])
         setOpen(false)
         setValue("content", "")

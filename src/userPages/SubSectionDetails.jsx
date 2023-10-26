@@ -1,78 +1,38 @@
 import { Button } from "@mui/material"
-import { useQuery} from "react-query"
-import { fetchNotesPerProjectId, fetchProjectById, fetchSubSectionsPerProjectId, fetchNotesPerSubSectionId } from "../../Utils/Queries"
-import { useNavigate, useParams, useLocation } from "react-router-dom"
-import { isUserLeader } from "../../Utils/Utils"
+import { useContext, useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { AppDataContext } from "../../context/AppDataContext"
 import { useAuth } from "../../customHooks/useAuth"
 import { useMutations } from "../../customHooks/useMutations"
-import { useState, useEffect, useContext } from "react"
-import ConfirmationPopup from "../assets/ConfirmationPopup"
-import { CreateSubSectionModal } from "../assets/CreateSubSectionModal"
 import { CreateNoteModal } from "../assets/CreateNoteModal"
-import { AppDataContext } from "../../context/AppDataContext"
+import { handleDeleteOneNote } from "../../Utils/Utils"
 
 
 const SubSectionDetails = () => {
-    const { allProjectNotes } = useContext(AppDataContext)
+    const { allProjectNotes, setAllProjectNotes, subSections } = useContext(AppDataContext)
     const {invalid, deleteNoteMutation} = useMutations()
     const {user} = useAuth()
-    const {state} = useLocation();
+    const {subSectionId, projectId} = useParams()
     const navigate = useNavigate()
+    const [subSection, setsubSection] = useState({})
     const [notes, setNotes] = useState([])
-    //todo have to find a way to make it so that if you just access the subsection details page (without going through /userhome or projectdetails page first)
-    //todo it still works, in the sense that certain objects (for example all application sources) are still fetched. Currently, the page will load but important thinss
-    //todo won't be fetched because the useQuery is in the projectDetails page. I'm sure theres a way to make it so that when one of either pages is reached, the fetch occurs.
     useEffect(() => {
-        if(state == null){
-            navigate(-1)
+        if(!subSectionId){
+            return navigate("/UserHome")
         }
     }, [])
-    const fetchNotesbySubsectionId = async (subSectionId) => {
-        const [ notes] = await Promise.all(
-            [
-                fetchNotesPerSubSectionId(subSectionId)
-            ]
-        );
-            return {notes};
-        };
+    useEffect(() => {
+        setsubSection(subSections.find((x)=>{return x._id===subSectionId}))
+        setNotes(allProjectNotes.filter((x)=>{return ((x.project==null)&&(x.subSection===subSectionId))}))
+    },[allProjectNotes])
 
-    const handleDeleteOneNote = (noteIdToBeDeleted)=>{
-        const newNotes = notes.filter(note => note._id !== noteIdToBeDeleted)
-        //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state.
-        setNotes(newNotes)
-        deleteNoteMutation.mutate([noteIdToBeDeleted])
-    }
-
-    const {error,data, isFetching} = useQuery('projects',() => fetchNotesbySubsectionId(state.subSection._id),{
-        onSuccess: (data) => {
-            setNotes(data.notes)
-            // if (data.project.project===null) {
-            //     return navigate('/UserHome')
-            // }
-            // const members = data.project.project.members
-            // const userExists = members.some(member => member._id === user.id)
-            // if (!userExists) {
-            //     return navigate('/UserHome')
-            // }
-            // setProject(data.project.project)
-            // setSubSections(data.subsections)
-            // setNotes(data.notes)
-        },
-        onError: (error) => {
-            navigate('/UserHome')
-        },
-        retry: false,
-        // refetchOnReconnect: 'always'
-        })
-    if (error) return <p>error</p>
-    if (isFetching) return <p>fetching...</p>
     return (
         <div>
             <p>Welcome to subsection detail page.</p>
             <p>---------------------------------------------------------------</p>
             <h2>Subsection details:</h2>
-            <p>name: {state.subSection.name}</p>
-            <p>description: {state.subSection.description}</p>
+            <p>name: {subSection.name}</p>
+            <p>description: {subSection.description}</p>
             <p>---------------------------------------------------------------</p>
             <h2>Notes associated with this subsection:</h2>
             {notes.map((note,i) => {
@@ -95,11 +55,11 @@ const SubSectionDetails = () => {
                     })
                     }
                 </ol>
-                <Button variant="text" type="button" onClick={() => handleDeleteOneNote(note._id)}>delete this note</Button>
+                <Button variant="text" type="button" onClick={() => handleDeleteOneNote(allProjectNotes,setAllProjectNotes,note._id,deleteNoteMutation)}>delete this note</Button>
                 </div>)
             })}
-            <CreateNoteModal notes={notes} setNotes={setNotes} subSectionId={state.subSection._id}></CreateNoteModal>
-            <button onClick={() => navigate(-1)}>go back</button>
+            <CreateNoteModal subSectionId={subSection._id}></CreateNoteModal>
+            <button onClick={() => navigate(`/ProjectDetails/${projectId}`)}>go back</button>
         </div>
     )
 
