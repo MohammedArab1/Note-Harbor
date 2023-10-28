@@ -26,7 +26,7 @@ const FetchProjectDetails = () => {
             return data
         }
         //todo add error handling here
-        if (projectId === undefined || projectId === null) return
+        if (projectId === undefined || projectId === null) return navigate("/UserHome")
         fetchProjectAndSubSectionsInUseEffect(projectId).then((data) => {
             setProject(data.project.project);
             setSubSections(data.subsections);
@@ -39,6 +39,18 @@ const FetchProjectDetails = () => {
             return navigate("/UserHome")
         })
     },[projectId])
+
+    useEffect(() => {
+        if (projectId === undefined || projectId === null) return navigate("/UserHome")
+        setqueriesFinished(false)
+        fetchAllNotesForProject(projectId,subSections.map((x) => {return x._id;})).then((data) => {
+            setAllProjectNotes(data)
+            setqueriesFinished(true)
+        }).catch((error) => {
+            return navigate("/UserHome")
+        })
+    }, [subSections])
+    
     
     if(!queriesFinished) return <p>Loading...</p>
     return (

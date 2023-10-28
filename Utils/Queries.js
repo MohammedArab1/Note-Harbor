@@ -27,7 +27,6 @@ axios.interceptors.request.use(
 // });
 
 
-//done, nothing to change
 export const loginQuery = userObject =>{
   return axios.post(`${baseUrl}/login`, userObject)
   .then(
@@ -35,7 +34,6 @@ export const loginQuery = userObject =>{
   )
 }
 
-//done, nothing to change
 export const registerQuery = userObject => {
   return axios.post(`${baseUrl}/user/register`, userObject)
   .then(
@@ -43,14 +41,12 @@ export const registerQuery = userObject => {
   )
 }
 
-//Done, lots of changes in the UserHomePage.jsx
 export const fetchProjectPerUserId = () => {
   return axios.get(`${baseUrl}/project`)
   .then(
     res => res.data
   )
 }
-//Done (hopefully), lots of changes in the ProjectDetails.jsx
 export const fetchProjectById = (projectId) => {
   return axios.get(`${baseUrl}/project/${projectId}`)
   .then(
@@ -58,7 +54,6 @@ export const fetchProjectById = (projectId) => {
   )
 }
 
-//Done (hopefully), lots of changes in the CreateProjectModal.jsx
 export const createProjectQuery = (projectObject) => {
   return axios.post(`${baseUrl}/project`, projectObject)
   .then(
@@ -66,7 +61,6 @@ export const createProjectQuery = (projectObject) => {
   )
 }
 
-//Done (hopefully), lots of changes in the JoinProjectModal.jsx
 export const joinProjectQuery = (projectObject) => {
   return axios.put(`${baseUrl}/project`, projectObject)
   .then(
@@ -75,7 +69,6 @@ export const joinProjectQuery = (projectObject) => {
 }
 
 
-//Done (hopefully), lots of changes in the ProjectDetails.jsx
 export const deleteProjectQuery = (projectId) => {
   return axios.delete(`${baseUrl}/project/${projectId}`)
   .then(
@@ -83,7 +76,6 @@ export const deleteProjectQuery = (projectId) => {
   )
 }
 
-//Done (hopefully), lots of changes in the ProjectDetails.jsx
 export const leaveProjectQuery = ({projectId,newProject}) => {
   return axios.put(`${baseUrl}/project/${projectId}`, newProject)
   .then(
@@ -91,7 +83,6 @@ export const leaveProjectQuery = ({projectId,newProject}) => {
   )
 }
 
-//Done (hopefully), lots of changes in the CreateSubSectionModal.jsx 
 export const createSubSectionQuery = (subSectionObject) => {
   return axios.post(`${baseUrl}/subsection`, subSectionObject)
   .then(
@@ -141,14 +132,6 @@ export const deleteTagQuery = (tagId) => {
   )
 }
 
-// export const deleteProjectQuery = (projectId) => {
-//   return axios.delete(`${baseUrl}/project/${projectId}`)
-//   .then(
-//     res => res.data
-//   )
-// }
-
-//Done (hopefully), lots of changes in the ProjectDetails.jsx
 export const fetchSubSectionsPerProjectId = (projectId) => {
   return axios.get(`${baseUrl}/subsection/${projectId}`)
   .then(
@@ -169,31 +152,10 @@ export const fetchTagsPerProjectId = (projectId) => {
     res => res.data
   )
 }
-//to be removed
-export const fetchUniqueSourcesPerProjectId = (projectId) => {
-  return axios.get(`${baseUrl}/source/project/${projectId}/unique`)
-  .then(
-    res => res.data
-  )
-}
-//to be removed
-export const fetchNotesPerSubSectionId = (subSectionId) => {
-  return axios.get(`${baseUrl}/note/subsection/${subSectionId}`)
-  .then(
-    res => res.data
-  )
-}
 
 export const fetchAllNotesForProject = (projectId,subsectionIds) => {
   return axios.post(`${baseUrl}/note/allNotes`,{projectId,subsectionIds})
   .then(
     res => res.data
   )
-}
-//to be removed
-export const deleteUniqueSourceQuery = ({projectId, source}) => {
-  return axios.post(`${baseUrl}/source/deleteUnique`, {projectId, source})
-  .then((res) => {
-    return res.data
-  })
 }

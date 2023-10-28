@@ -11,12 +11,12 @@ import { CreateTagModal } from "../assets/CreateTagModal"
 import CircleIcon from '@mui/icons-material/Circle';
 import { AppDataContext } from "../../context/AppDataContext"
 import { CreateSourceModal } from "../assets/CreateSourceModal"
-import { handleDeleteOneNote } from "../../Utils/Utils"
+import { handleDeleteOneNote, handleDeleteOneTag, handleDeleteOneSubSection } from "../../Utils/Utils"
 
 const ProjectDetails = () => {
   const { tags, setTags, allProjectNotes, setAllProjectNotes, project, setProject, subSections,setSubSections } = useContext(AppDataContext)
   const [uniqueSources, setUniqueSources] = useState([])
-  const {deleteProjectMutation,invalid, leaveProjectMutation, deleteNoteMutation, deleteSubSectionMutation, deleteTagMutation, deleteUniqueSourceMutation} = useMutations()
+  const {deleteProjectMutation,invalid, leaveProjectMutation, deleteNoteMutation, deleteSubSectionMutation, deleteTagMutation} = useMutations()
   const {user} = useAuth()
   const {projectId} = useParams()
   const navigate = useNavigate()
@@ -34,24 +34,6 @@ const ProjectDetails = () => {
 
   const handleVisitSubSectionDetailPage = (subSection) => {
     navigate(`/ProjectDetails/${projectId}/SubSectionDetails/${subSection._id}`)
-  }
-
-  const handleDeleteOneSubSection = (subSectionIdToBeDeleted) => {
-    const newSubSections = subSections.filter(subSection => subSection._id !== subSectionIdToBeDeleted)
-    //todo you're going to need to do some sort of error catching here in case the mutation fails, you don't updates the notes state. 
-    //(pretty sure tehre's an onSuccess for mutations) (there is, check createNoteModal.js)
-    setSubSections(newSubSections)
-    deleteSubSectionMutation.mutate(subSectionIdToBeDeleted)
-  }
-
-  const handleDeleteOneTag = (tagIdToBeDeleted) => {
-    //*********todo next handle tag creation and deletion (make sure they work properly)(and cleanup unused queries in queries.js)
-    deleteTagMutation.mutate(tagIdToBeDeleted, {
-      onSuccess: (data) => {
-        const newTags = tags.filter(tag => tag._id !== tagIdToBeDeleted)
-        setTags(newTags)
-      }
-    })
   }
 
   useEffect(() => {
@@ -103,7 +85,9 @@ const ProjectDetails = () => {
             <ConfirmationPopup 
               name="Delete SubSection" 
               message={"Are you sure you want to delete subsection? All notes associated with this subsection will be deleted"}
-              onConfirm={() => handleDeleteOneSubSection(subsection._id)}>
+              onConfirm={() => {
+                handleDeleteOneSubSection(subSections,setSubSections, subsection._id, deleteSubSectionMutation)
+              }}>
             </ConfirmationPopup>
           </div>)
         })}
@@ -156,7 +140,7 @@ const ProjectDetails = () => {
               })
             }
           </ol>
-          <Button variant="text" type="button" onClick={() => handleDeleteOneNote(note._id)}>delete this note</Button>
+          <Button variant="text" type="button" onClick={() => handleDeleteOneNote(allProjectNotes,setAllProjectNotes,note._id,deleteNoteMutation)}>delete this note</Button>
         </div>)
       })}
       <CreateNoteModal projectId={projectId}></CreateNoteModal>
@@ -172,7 +156,7 @@ const ProjectDetails = () => {
           <ConfirmationPopup 
               name="Delete tag" 
               message={"Are you sure you want to delete this tag? Notes will no longer be tagged with this tag"}
-              onConfirm={() => handleDeleteOneTag(tag._id)}>
+              onConfirm={() => handleDeleteOneTag(tags,setTags,tag._id, deleteTagMutation)}>
             </ConfirmationPopup>
         </div>)
       })}

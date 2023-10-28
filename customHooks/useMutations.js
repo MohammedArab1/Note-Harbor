@@ -13,7 +13,7 @@ import {
     deleteSubSectionQuery,
     deleteTagQuery,
     createSourceQuery, //to remove
-    deleteUniqueSourceQuery  } from "../Utils/Queries"; //to remove
+    } from "../Utils/Queries"; 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "./useAuth";
@@ -152,14 +152,6 @@ export const useMutations = () => {
             }
         })
     )
-    //to be removed
-    const [deleteUniqueSourceMutation, setDeleteUniqueSourceMutation] = useState(
-        useMutation(deleteUniqueSourceQuery, {
-            onError: (error) => {
-                setInvalidError(setInvalid, error)
-            }
-        })
-    )
     
 
     return { deleteProjectMutation, 
@@ -175,6 +167,5 @@ export const useMutations = () => {
         deleteSubSectionMutation,
         deleteTagMutation,
         createSourceMutation, //to be removed
-        deleteUniqueSourceMutation, //to be removed
         invalid }
 }

@@ -13,7 +13,8 @@ import CircleIcon from '@mui/icons-material/Circle';
 
 
 export const CreateTagModal = ({projectId, tags, setTags}) => {
-
+  //todo fix the console issues that popup in the browser when opening the create tag modal
+  //todo also make sure to properly cleanup anything associated with sources on the frontend and backend
   const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const style = {
     position: 'absolute',

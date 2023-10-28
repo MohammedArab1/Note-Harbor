@@ -22,3 +22,21 @@ export const handleDeleteOneNote = (allProjectNotes, setAllProjectNotes, noteIdT
     }
   })
 }
+
+export const handleDeleteOneTag = (tags, setTags, tagIdToBeDeleted, deleteTagMutation) => {
+  deleteTagMutation.mutate(tagIdToBeDeleted, {
+    onSuccess: (data) => {
+      const newTags = tags.filter(tag => tag._id !== tagIdToBeDeleted)
+      setTags(newTags)
+    }
+  })
+}
+
+export const handleDeleteOneSubSection = (subSections, setSubSections, subSectionIdToBeDeleted, deleteSubSectionMutation) => {
+  deleteSubSectionMutation.mutate(subSectionIdToBeDeleted,{
+    onSuccess: (data) => {
+      const newSubSections = subSections.filter(subSection => subSection._id !== subSectionIdToBeDeleted)
+      setSubSections(newSubSections)
+    }
+  })
+}
