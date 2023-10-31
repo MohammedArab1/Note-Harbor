@@ -10,8 +10,8 @@ import { CreateNoteModal } from "../assets/CreateNoteModal"
 import { CreateTagModal } from "../assets/CreateTagModal"
 import CircleIcon from '@mui/icons-material/Circle';
 import { AppDataContext } from "../../context/AppDataContext"
-import { CreateSourceModal } from "../assets/CreateSourceModal"
 import { handleDeleteOneNote, handleDeleteOneTag, handleDeleteOneSubSection } from "../../Utils/Utils"
+import ViewNoteDetailsDialog from "../assets/ViewNoteDetailsDialog"
 
 const ProjectDetails = () => {
   const { tags, setTags, allProjectNotes, setAllProjectNotes, project, setProject, subSections,setSubSections } = useContext(AppDataContext)
@@ -102,6 +102,7 @@ const ProjectDetails = () => {
           <p>note created by: {note.user.firstName + " "+ note.user.lastName}</p>
           <p>note date created: {note.dateCreated}</p>
           <p>sources for this note:</p>
+          
           <ol>
             {
               note.sources.map((source,i)=>{
@@ -114,6 +115,13 @@ const ProjectDetails = () => {
               })
             }
           </ol>
+          <ViewNoteDetailsDialog name="View Note Details" 
+            noteContent={note.content}
+            noteCreatedBy={note.user.firstName + " "+ note.user.lastName} 
+            noteDateCreated={note.dateCreated}
+            noteSources={note.sources}
+          />
+          <br />
           <Button variant="text" type="button" onClick={() => handleDeleteOneNote(allProjectNotes,setAllProjectNotes,note._id,deleteNoteMutation)}>delete this note</Button>
         </div>)
       })}
@@ -169,14 +177,8 @@ const ProjectDetails = () => {
           <div key={i}>
             <h3>source {i+1}</h3>
             <p>source name: {source.source}</p>
-            {/* <ConfirmationPopup 
-              name="Delete source" 
-              message={"Are you sure you want to delete this source? Notes will no longer be sourced with this source"}
-              onConfirm={() => handleDeleteUniqueSource(projectId,source)}>
-            </ConfirmationPopup> */}
           </div>)
       })}
-      {/* <CreateSourceModal sources={sources} setSources={setSources} projectId={projectId}/> */}
       <p>---------------------------------------------------------------</p>
       { isUserLeader(project.leader._id) && <ConfirmationPopup name="Delete project" message={projectLeaderDeleteMessage} onConfirm={() => deleteProjectMutation.mutate(projectId)}></ConfirmationPopup>}
       <button onClick={() => navigate(`/UserHome`)}>go back</button>

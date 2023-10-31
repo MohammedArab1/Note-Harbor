@@ -103,13 +103,6 @@ export const createTagQuery = (tagObject) => {
     return res.data
   })
 }
-//to be removed
-export const createSourceQuery = (sourceObject) => {
-  return axios.post(`${baseUrl}/source`, sourceObject)
-  .then((res) => {
-    return res.data
-  })
-}
 
 export const deleteNoteQuery = (noteIds) => {
   return axios.post(`${baseUrl}/note/deleteMany`, {noteIds:noteIds})

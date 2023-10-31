@@ -10,6 +10,7 @@ const FetchProjectDetails = () => {
     const {user} = useAuth()
     const navigate = useNavigate()
     const [queriesFinished, setqueriesFinished] = useState(false)
+    const [projectFetched, setProjectFetched] = useState(false)
 
     const fetchProjectAndSubSections = async (projectId) => {
         const [project, subsections, tags] = await Promise.all([
@@ -31,14 +32,26 @@ const FetchProjectDetails = () => {
             setProject(data.project.project);
             setSubSections(data.subsections);
             setTags(data.tags.tags);
-            fetchAllNotesForProject(projectId,data.subsections.map((x) => {return x._id;})).then((data) => {
-                setAllProjectNotes(data)
-                setqueriesFinished(true)
-            })
         }).catch((error) => {
             return navigate("/UserHome")
         })
     },[projectId])
+
+    /*
+        If the following useEffect is not present, sometimes there is an error when trying to access the projectDetails page 
+        because the setqueriesFinished(true) sometimes gets called before the setProject(data.project.project) in the above useEffect
+        (its not that it gets called before, its that the setProject(data.project.project) in the above useEffect sometimes does not 
+        get changed before the setqueriesFinished(true) gets called)
+    */
+    useEffect(() => {
+        if (!project) {
+            setProjectFetched(false)
+        }
+        else {
+            setProjectFetched(true)
+        }
+    }, [project])
+    
 
     useEffect(() => {
         if (projectId === undefined || projectId === null) return navigate("/UserHome")
@@ -51,8 +64,9 @@ const FetchProjectDetails = () => {
         })
     }, [subSections])
     
-    
-    if(!queriesFinished) return <p>Loading...</p>
+    if(!queriesFinished || !projectFetched){
+        return <p>Loading...</p>
+    }
     return (
         <Outlet/> 
     )
