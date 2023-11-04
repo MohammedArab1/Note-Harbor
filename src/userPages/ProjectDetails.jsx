@@ -117,6 +117,7 @@ const ProjectDetails = () => {
           </ol>
           <ViewNoteDetailsDialog name="View Note Details" 
             noteContent={note.content}
+            noteId={note._id}
             noteCreatedBy={note.user.firstName + " "+ note.user.lastName} 
             noteDateCreated={note.dateCreated}
             noteSources={note.sources}

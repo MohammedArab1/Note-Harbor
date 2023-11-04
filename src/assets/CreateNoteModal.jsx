@@ -34,6 +34,7 @@ export const CreateNoteModal = ({projectId,subSectionId}) => {
   const handleClose = () => setOpen(false);
   const [addSource, setAddSource] = React.useState(false)
   const [userSourceInput, setUserSourceInput] = React.useState('')
+  const [userAdditionalSourceInformationInput, setUserAdditionalSourceInformationInput] = React.useState('')
   const handleAddSource = () => {
     setAddSource(!addSource)
   }
@@ -50,15 +51,15 @@ export const CreateNoteModal = ({projectId,subSectionId}) => {
     setUniqueSources(calculatedUniqueSources)
   }, [allProjectNotes])
   
-
   const handleCreateNote= async(data) => {
     const {content} = data
-    createNoteMutation.mutate({content, projectId:projectId||null, subSectionId:subSectionId||null, sources:userSourceInput?[{source:userSourceInput}]:[]}, {
+    createNoteMutation.mutate({content, projectId:projectId||null, subSectionId:subSectionId||null, sources:userSourceInput?[{source:userSourceInput, additionalSourceInformation:userAdditionalSourceInformationInput}]:[]}, {
       onSuccess: (data) => {
         setAllProjectNotes([...allProjectNotes, data])
         setOpen(false)
         setValue("content", "")
         setValue("source", "")
+        setValue("additionalSourceInformation", "")
         setAddSource(false)
       }
     })
@@ -78,16 +79,17 @@ export const CreateNoteModal = ({projectId,subSectionId}) => {
             >
                 {invalid.isInvalid && <p>{invalid.message}</p>}
                 <TextField
-                error={errors.content ? true : false}
-                helperText={errors.content?.message}
-                required
-                id="content"
-                label="Note content"
-                {...register("content")}
+                  error={errors.content ? true : false}
+                  helperText={errors.content?.message}
+                  required
+                  id="content"
+                  label="Note content"
+                  {...register("content")}
                 />
                 <br />
                 <FormControlLabel control={<Checkbox checked={addSource} {...register("addSource")} onChange={handleAddSource}/>} label="Add Source" />
-                {addSource && 
+                {addSource &&
+                <>
                   <Autocomplete
                     freeSolo
                     id="source"
@@ -112,6 +114,15 @@ export const CreateNoteModal = ({projectId,subSectionId}) => {
                       />
                     )}
                   />
+                  <br />
+                  <TextField
+                    id="additionalSourceInformation"
+                    label="Additional Source Information"
+                    {...register("additionalSourceInformation")}
+                    value={userAdditionalSourceInformationInput}
+                    onChange={(e) => setUserAdditionalSourceInformationInput(e.target.value)}
+                  />
+                </>
                 }
                 <br />
                 <Button variant="text" type="submit">Create Note</Button>

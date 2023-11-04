@@ -104,6 +104,13 @@ export const createTagQuery = (tagObject) => {
   })
 }
 
+export const createCommentQuery = (commentObject) => {
+  return axios.post(`${baseUrl}/comment`, commentObject)
+  .then((res) => {
+    return res.data
+  })
+}
+
 export const deleteNoteQuery = (noteIds) => {
   return axios.post(`${baseUrl}/note/deleteMany`, {noteIds:noteIds})
   .then((res) => {

@@ -42,3 +42,7 @@ export const createTagSchema = Yup.object().shape({
 export const createSourceSchema = Yup.object().shape({
   source: Yup.string().required("Source is required"),
 })
+
+export const createNoteCommentSchema = Yup.object().shape({
+  noteComment: Yup.string().required("Comment text cannot be empty"),
+})

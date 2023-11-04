@@ -12,6 +12,7 @@ import {
     createTagQuery,
     deleteSubSectionQuery,
     deleteTagQuery,
+    createCommentQuery
     } from "../Utils/Queries"; 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -120,6 +121,14 @@ export const useMutations = () => {
         })
     )
 
+    const [createCommentMutation, setCreateCommentMutation] = useState(
+        useMutation(createCommentQuery, {
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
+
     const [deleteNoteMutation, setDeleteNoteMutation] = useState(
         useMutation(deleteNoteQuery, {
             onError: (error) => {
@@ -157,5 +166,6 @@ export const useMutations = () => {
         createTagMutation, 
         deleteSubSectionMutation,
         deleteTagMutation,
+        createCommentMutation,
         invalid }
 }
