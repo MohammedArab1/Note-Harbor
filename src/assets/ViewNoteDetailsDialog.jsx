@@ -3,12 +3,16 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { TextField, Box, useMediaQuery } from '@mui/material';
-import { createNoteCommentSchema } from '../../Utils/yupSchemas';
+import { createNoteCommentSchema, createCommentReplySchema } from '../../Utils/yupSchemas';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutations } from '../../customHooks/useMutations';
+import { fetchCommentsPerNoteId } from '../../Utils/Queries';
+import { useQuery } from "react-query"
+import Comment from '../Components/Comment';
+import { handleNoteCommentSubmit } from '../../Utils/Utils';
 
 const ViewNoteDetailsDialog = ({
 	name,
@@ -31,10 +35,43 @@ const ViewNoteDetailsDialog = ({
 		p: 4,
 	};
 	const [open, setOpen] = useState(false);
+	const [comments, setComments] = useState([])
+	const [isFetchingComments, setIsFetchingComments] = useState(false)
 	const {createCommentMutation,invalid} = useMutations()
+	const [commentTree, setCommentTree] = useState([])
 
-	const handleOpen = () => {
+	function createCommentTree(comments) {
+		let commentMap = {};
+		comments.forEach(comment => commentMap[comment._id] = {...comment, children: []});
+		let commentTree = [];
+		comments.forEach(comment => {
+			if(comment.inReplyTo) {
+				commentMap[comment.inReplyTo._id].children.push(commentMap[comment._id]);
+			} else {
+				commentTree.push(commentMap[comment._id]);
+			}
+		});
+	
+		return commentTree;
+	}
+
+	useEffect(() => {
+		setCommentTree(createCommentTree(comments))
+	}, [comments])
+	
+
+	const handleOpen = async () => {
 		setOpen(true);
+		setIsFetchingComments(true)
+		fetchCommentsPerNoteId(noteId).then((data) =>{
+			setComments(data)
+		}).catch(()=>{
+			setOpen(false)
+		})
+		.finally(()=>{
+			setIsFetchingComments(false) //todo should note have a set in a finally, what if open is false? can't set state when 
+			// component is unmounted
+		})
 	};
 
 	const handleClose = () => {
@@ -44,18 +81,6 @@ const ViewNoteDetailsDialog = ({
 	const {register, handleSubmit, formState:{errors}, setValue, control} = useForm({
 		resolver:yupResolver(createNoteCommentSchema) 
 	})
-
-	const handleNoteCommentSubmit = (data, noteId) => {
-		console.log("submitted comment. data is: ", data, "note id is: ", noteId)
-		//todo handle create comment properly
-		// createCommentMutation.mutate({content:data.noteComment,note:noteId }, {
-		// 	// onSuccess: (data) => {
-		// 	// 	setAllProjectNotes([...allProjectNotes, data])
-		// 	// 	setOpen(false)
-		// 	// 	setValue("content", "")
-		// 	// }
-		// })
-	}
 
 	return (
 		<div>
@@ -89,7 +114,7 @@ const ViewNoteDetailsDialog = ({
 					component="form"
 					noValidate
 					autoComplete="off"
-					onSubmit={handleSubmit((data)=>{handleNoteCommentSubmit(data, noteId)})}>
+					onSubmit={handleSubmit((data)=>{handleNoteCommentSubmit(data, noteId,createCommentMutation,setValue,setComments, comments)})}>
 						<TextField 
 							multiline
 							error={errors.noteComment ? true : false}
@@ -101,6 +126,24 @@ const ViewNoteDetailsDialog = ({
 						/>
 						<Button variant="text" type="submit">Add Comment</Button>
 					</Box>
+					{isFetchingComments 
+					?
+					<p>loading comments...</p>
+					:
+						<>
+							<h3>
+								comments:
+							</h3>
+							<ol>
+								{
+									commentTree.map((comment,i)=>{
+										return <Comment key={i} comment={comment} noteId={noteId} setComments={setComments} comments={comments} />
+									})
+								}
+							</ol>
+						</>
+					}
+					
 				</DialogContent>
 			</Dialog>
 		</div>

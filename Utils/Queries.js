@@ -159,3 +159,10 @@ export const fetchAllNotesForProject = (projectId,subsectionIds) => {
     res => res.data
   )
 }
+
+export const fetchCommentsPerNoteId = (noteId) => {
+  return axios.get(`${baseUrl}/comment/note/${noteId}`)
+  .then(
+    res => res.data
+  )
+}

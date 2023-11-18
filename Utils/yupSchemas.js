@@ -46,3 +46,7 @@ export const createSourceSchema = Yup.object().shape({
 export const createNoteCommentSchema = Yup.object().shape({
   noteComment: Yup.string().required("Comment text cannot be empty"),
 })
+
+export const createCommentReplySchema = Yup.object().shape({
+  commentReply: Yup.string().required("Comment text cannot be empty"),
+})

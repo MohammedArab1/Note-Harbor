@@ -40,3 +40,17 @@ export const handleDeleteOneSubSection = (subSections, setSubSections, subSectio
     }
   })
 }
+
+export const handleNoteCommentSubmit = (data, noteId, createCommentMutation, setValue, setComments, comments, inReplyTo = null) => {
+  const commentData = {
+    content: data.noteComment,
+    note: noteId,
+    ...(inReplyTo && { inReplyTo: inReplyTo })
+  };
+  createCommentMutation.mutate(commentData, {
+    onSuccess: (data) => {
+      setValue("noteComment", "")
+      setComments([...comments, data])
+    }
+  })
+}
