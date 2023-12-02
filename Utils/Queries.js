@@ -104,6 +104,14 @@ export const createTagQuery = (tagObject) => {
   })
 }
 
+export const updateTagNoteQuery = ({tagIds,note}) => {
+  const promises = tagIds.map(tagId => 
+    axios.patch(`${baseUrl}/tag/${tagId}`, {note})
+        .then(res => res.data)
+  );
+  return Promise.all(promises);
+}
+
 export const createCommentQuery = (commentObject) => {
   return axios.post(`${baseUrl}/comment`, commentObject)
   .then((res) => {

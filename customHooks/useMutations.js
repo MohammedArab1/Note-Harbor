@@ -10,6 +10,7 @@ import {
     createNoteQuery,
     deleteNoteQuery,
     createTagQuery,
+    updateTagNoteQuery,
     deleteSubSectionQuery,
     deleteTagQuery,
     createCommentQuery
@@ -121,6 +122,14 @@ export const useMutations = () => {
         })
     )
 
+    const [updateTagNoteMutation, setUpdateTagNoteMutation] = useState(
+        useMutation(updateTagNoteQuery, {
+            onError: (error) => {
+                setInvalidError(setInvalid, error)
+            }
+        })
+    )
+
     const [createCommentMutation, setCreateCommentMutation] = useState(
         useMutation(createCommentQuery, {
             onError: (error) => {
@@ -164,6 +173,7 @@ export const useMutations = () => {
         createNoteMutation,
         deleteNoteMutation,
         createTagMutation, 
+        updateTagNoteMutation,
         deleteSubSectionMutation,
         deleteTagMutation,
         createCommentMutation,

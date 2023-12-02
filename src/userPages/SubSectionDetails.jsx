@@ -6,7 +6,7 @@ import { useAuth } from "../../customHooks/useAuth"
 import { useMutations } from "../../customHooks/useMutations"
 import { CreateNoteModal } from "../assets/CreateNoteModal"
 import { handleDeleteOneNote } from "../../Utils/Utils"
-
+import ViewNoteDetailsDialog from "../assets/ViewNoteDetailsDialog"
 
 const SubSectionDetails = () => {
     const { allProjectNotes, setAllProjectNotes, subSections } = useContext(AppDataContext)
@@ -55,6 +55,13 @@ const SubSectionDetails = () => {
                     })
                     }
                 </ol>
+                <ViewNoteDetailsDialog name="View Note Details" 
+                    noteContent={note.content}
+                    noteId={note._id}
+                    noteCreatedBy={note.user.firstName + " "+ note.user.lastName} 
+                    noteDateCreated={note.dateCreated}
+                    noteSources={note.sources}
+                />
                 <Button variant="text" type="button" onClick={() => handleDeleteOneNote(allProjectNotes,setAllProjectNotes,note._id,deleteNoteMutation)}>delete this note</Button>
                 </div>)
             })}

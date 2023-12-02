@@ -162,6 +162,16 @@ const ProjectDetails = () => {
           <p>tag name: {tag.tagName}</p>
           <p>tag id: {tag._id}</p>
           <p>tag colour: {<CircleIcon style={{ color: tag.colour }} fontSize='large'/>}</p>
+          <p>notes associated with this tag: </p>
+          <ol>
+            {
+              tag.notes.map((note,i)=>{
+                return (<li key={i}>
+                  {note}
+                </li>)
+              })
+            }
+          </ol>
           <ConfirmationPopup 
               name="Delete tag" 
               message={"Are you sure you want to delete this tag? Notes will no longer be tagged with this tag"}

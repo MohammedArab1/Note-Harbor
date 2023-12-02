@@ -63,6 +63,18 @@ const FetchProjectDetails = () => {
             return navigate("/UserHome")
         })
     }, [subSections])
+
+    useEffect(() => {
+        if (projectId === undefined || projectId === null) return navigate("/UserHome")
+        setqueriesFinished(false)
+        fetchTagsPerProjectId(projectId).then((data) => {
+            setTags(data.tags)
+            setqueriesFinished(true)
+        }).catch((error) => {
+            return navigate("/UserHome")
+        })
+    }, [allProjectNotes])
+    
     
     if(!queriesFinished || !projectFetched){
         return <p>Loading...</p>
