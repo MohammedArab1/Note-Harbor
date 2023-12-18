@@ -4,18 +4,18 @@ export const useLocalStorage = () => {
   const [value, setValue] = useState(null)
 
   const setItem = (key, value) => {
-    sessionStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(key, JSON.stringify(value))
     setValue(value)
   }
 
   const getItem = (key) => {
-    const value = JSON.parse(sessionStorage.getItem(key))
+    const value = JSON.parse(localStorage.getItem(key))
     setValue(value)
     return value
   }
 
   const removeItem = (key) => {
-    sessionStorage.removeItem(key)
+    localStorage.removeItem(key)
     setValue(null)
   }
   return { value, setItem, getItem, removeItem }

@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { useParams, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../customHooks/useAuth';
 import { fetchProjectById, fetchSubSectionsPerProjectId, fetchTagsPerProjectId, fetchAllNotesForProject } from '../../Utils/Queries';
@@ -11,14 +11,15 @@ const FetchProjectDetails = () => {
     const navigate = useNavigate()
     const [queriesFinished, setqueriesFinished] = useState(false)
     const [projectFetched, setProjectFetched] = useState(false)
+    const initialRenderForSubSectionUseEffect = useRef(true);
+    const initialRenderForAllProjectNotesUseEffect = useRef(true);
 
     const fetchProjectAndSubSections = async (projectId) => {
-        const [project, subsections, tags] = await Promise.all([
+        const [project, subsections] = await Promise.all([
             fetchProjectById(projectId),
             fetchSubSectionsPerProjectId(projectId),
-            fetchTagsPerProjectId(projectId),
         ]);
-        return { project, subsections, tags };
+        return { project, subsections};
     };
     useEffect(() => {
         setqueriesFinished(false)
@@ -31,7 +32,6 @@ const FetchProjectDetails = () => {
         fetchProjectAndSubSectionsInUseEffect(projectId).then((data) => {
             setProject(data.project.project);
             setSubSections(data.subsections);
-            setTags(data.tags.tags);
         }).catch((error) => {
             return navigate("/UserHome")
         })
@@ -54,18 +54,30 @@ const FetchProjectDetails = () => {
     
 
     useEffect(() => {
-        if (projectId === undefined || projectId === null) return navigate("/UserHome")
-        setqueriesFinished(false)
+        if (projectId === undefined || projectId === null) {
+            console.log("projectId is undefined or null. returning")
+            return navigate("/UserHome")
+        }
+        if (initialRenderForSubSectionUseEffect.current){
+            initialRenderForSubSectionUseEffect.current = false;
+            return
+        } 
+        setqueriesFinished(false) //todo might need to remove
         fetchAllNotesForProject(projectId,subSections.map((x) => {return x._id;})).then((data) => {
             setAllProjectNotes(data)
-            setqueriesFinished(true)
         }).catch((error) => {
             return navigate("/UserHome")
         })
     }, [subSections])
 
     useEffect(() => {
-        if (projectId === undefined || projectId === null) return navigate("/UserHome")
+        if (projectId === undefined || projectId === null) {
+            return navigate("/UserHome")
+        }
+        if (initialRenderForAllProjectNotesUseEffect.current){
+            initialRenderForAllProjectNotesUseEffect.current = false;
+            return
+        }
         setqueriesFinished(false)
         fetchTagsPerProjectId(projectId).then((data) => {
             setTags(data.tags)

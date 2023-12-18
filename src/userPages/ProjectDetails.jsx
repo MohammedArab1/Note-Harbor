@@ -12,6 +12,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import { AppDataContext } from "../../context/AppDataContext"
 import { handleDeleteOneNote, handleDeleteOneTag, handleDeleteOneSubSection } from "../../Utils/Utils"
 import ViewNoteDetailsDialog from "../assets/ViewNoteDetailsDialog"
+import { isOfflineMode } from "../../Utils/Utils"
 
 const ProjectDetails = () => {
   const { tags, setTags, allProjectNotes, setAllProjectNotes, project, setProject, subSections,setSubSections } = useContext(AppDataContext)
@@ -31,11 +32,9 @@ const ProjectDetails = () => {
     }
     leaveProjectMutation.mutate({projectId:newProject._id,newProject})
   }
-
   const handleVisitSubSectionDetailPage = (subSection) => {
     navigate(`/ProjectDetails/${projectId}/SubSectionDetails/${subSection._id}`)
   }
-
   useEffect(() => {
     const allSources = allProjectNotes.reduce((accumulator, note) => {
       return accumulator.concat(note.sources);
@@ -48,7 +47,6 @@ const ProjectDetails = () => {
     setUniqueSources(uniqueSources)
     setNotes(allProjectNotes.filter((x)=>{return x.project!=null}))
   }, [allProjectNotes])
-  
   return (
     <div>
       {invalid.isInvalid && <p>{invalid.message}</p>}
@@ -58,7 +56,7 @@ const ProjectDetails = () => {
       <p>project id: {project._id}</p>
       <p>---------------------------------------------------------------</p>
       <h2>OTHER MEMBERS:</h2>
-      {project.members.filter(member => member._id !== user.id).map((member,i) => {
+      {project?.members?.filter(member => member._id !== user.id).map((member,i) => {
         return (
           <div key={i}>
             <h3>member {i+1}</h3>
@@ -70,9 +68,9 @@ const ProjectDetails = () => {
         )})}
       <p>---------------------------------------------------------------</p>
       <h2>Me:</h2>
-      <p>My name: {user.firstName} {user.lastName}</p>
-      <p>My email: {user.email}</p>
-      <p>My id: {user.id}</p>
+      <p>My name: {user?.firstName} {user?.lastName}</p>
+      <p>My email: {user?.email}</p>
+      <p>My id: {user?.id}</p>
       <p>---------------------------------------------------------------</p>
       <h2>SubSections:</h2>
       {subSections.map((subsection,i) => {
@@ -91,15 +89,16 @@ const ProjectDetails = () => {
             </ConfirmationPopup>
           </div>)
         })}
-      { isUserLeader(project.leader._id) && <CreateSubSectionModal subSections={subSections} setSubSections={setSubSections} projectId={projectId}></CreateSubSectionModal>}
+      { (isUserLeader(project?.leader?._id ) || isOfflineMode()) && <CreateSubSectionModal subSections={subSections} setSubSections={setSubSections} projectId={projectId}></CreateSubSectionModal>}
       <p>---------------------------------------------------------------</p>
       <h2>All Application Notes:</h2>
       {allProjectNotes?.map((note,i) => {
         return (
         <div key={i}>
           <h3>note {i+1}</h3>
+          <p>note id: {note._id}</p>
           <p>note content: {note.content}</p>
-          <p>note created by: {note.user.firstName + " "+ note.user.lastName}</p>
+          <p>note created by: {note.user?.firstName + " "+ note.user?.lastName}</p>
           <p>note date created: {note.dateCreated}</p>
           <p>sources for this note:</p>
           
@@ -118,7 +117,7 @@ const ProjectDetails = () => {
           <ViewNoteDetailsDialog name="View Note Details" 
             noteContent={note.content}
             noteId={note._id}
-            noteCreatedBy={note.user.firstName + " "+ note.user.lastName} 
+            noteCreatedBy={note.user?.firstName + " "+ note.user?.lastName} 
             noteDateCreated={note.dateCreated}
             noteSources={note.sources}
           />
@@ -134,7 +133,7 @@ const ProjectDetails = () => {
         <div key={i}>
           <h3>note {i+1}</h3>
           <p>note content: {note.content}</p>
-          <p>note created by: {note.user.firstName + " "+ note.user.lastName}</p>
+          <p>note created by: {note.user?.firstName + " "+ note.user?.lastName}</p>
           <p>note date created: {note.dateCreated}</p>
           <p>sources for this note:</p>
           <ol>
@@ -191,12 +190,13 @@ const ProjectDetails = () => {
           </div>)
       })}
       <p>---------------------------------------------------------------</p>
-      { isUserLeader(project.leader._id) && <ConfirmationPopup name="Delete project" message={projectLeaderDeleteMessage} onConfirm={() => deleteProjectMutation.mutate(projectId)}></ConfirmationPopup>}
+      { (isUserLeader(project?.leader?._id ) || isOfflineMode()) && <ConfirmationPopup name="Delete project" message={projectLeaderDeleteMessage} onConfirm={() => deleteProjectMutation.mutate(projectId)}></ConfirmationPopup>}
       <button onClick={() => navigate(`/UserHome`)}>go back</button>
       <br/>
-      { isUserLeader(project.leader._id) ?  
-      <ConfirmationPopup name="Leave project" message={projectLeaderLeaveMessage} onConfirm={() => handleLeaveProject(user.id)}></ConfirmationPopup> :
-      <Button variant="text" type="button" onClick={() => handleLeaveProject(user.id)}>Leave project</Button> 
+      { !isOfflineMode() &&
+        ((isUserLeader(project?.leader?._id )) ?  
+        <ConfirmationPopup name="Leave project" message={projectLeaderLeaveMessage} onConfirm={() => handleLeaveProject(user.id)}></ConfirmationPopup> :
+        <Button variant="text" type="button" onClick={() => handleLeaveProject(user.id)}>Leave project</Button> )
       }
     </div>
   )

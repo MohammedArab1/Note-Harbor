@@ -1,9 +1,9 @@
 export const returnSessionObject = () => {
-  return JSON.parse(sessionStorage.getItem('user'))
+  return JSON.parse(localStorage.getItem('user'))
 }
 
 export const isUserLeader = (userId) => {
-  return returnSessionObject().id === userId;
+  return returnSessionObject()?.id && returnSessionObject()?.id === userId;
 }
 
 export const setInvalidError = (setInvalid, error) => {
@@ -54,3 +54,11 @@ export const handleNoteCommentSubmit = (data, noteId, createCommentMutation, set
     }
   })
 }
+
+export const isOfflineMode = () => {
+  const offlineMode = localStorage.getItem("offlineMode")
+  if (offlineMode === null || offlineMode === undefined || offlineMode === "") {
+    return false
+  }
+  return offlineMode === "true"
+};

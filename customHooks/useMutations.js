@@ -45,6 +45,7 @@ export const useMutations = () => {
             onSuccess: (data) => {
                 const user = {token:data.token,id:data.user._id,email:data.user.email,firstName:data.user.firstName,lastName:data.user.lastName}
                 login(user)
+                localStorage.setItem("offlineMode", false);
                 navigate('/UserHome')
             },
             onError: (error) => {
@@ -57,7 +58,6 @@ export const useMutations = () => {
         useMutation(registerQuery, {
             onSuccess: (data) => {
                 const user = {token:data.token,id:data.newUser._id,email:data.newUser.email,firstName:data.newUser.firstName,lastName:data.newUser.lastName}
-                // sessionStorage.setItem('user',JSON.stringify(user))
                 login(user)
                 navigate('/UserHome')
             },

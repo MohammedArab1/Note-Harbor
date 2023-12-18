@@ -22,10 +22,10 @@ const SubSectionDetails = () => {
         }
     }, [])
     useEffect(() => {
-        setsubSection(subSections.find((x)=>{return x._id===subSectionId}))
-        setNotes(allProjectNotes.filter((x)=>{return ((x.project==null)&&(x.subSection===subSectionId))}))
+        setsubSection(subSections.find((x)=>{return x._id==subSectionId}))
+        setNotes(allProjectNotes.filter((x)=>{return ((x.project==null)&&(x.subSection==subSectionId))}))
     },[allProjectNotes])
-
+    console.log("notes for this subsection is: ", notes)
     return (
         <div>
             <p>Welcome to subsection detail page.</p>
@@ -40,7 +40,7 @@ const SubSectionDetails = () => {
                 <div key={i}>
                 <h3>note {i+1}</h3>
                 <p>note content: {note.content}</p>
-                <p>note created by: {note.user.firstName + " "+ note.user.lastName}</p>
+                <p>note created by: {note?.user?.firstName + " "+ note?.user?.lastName}</p>
                 <p>note date created: {note.dateCreated}</p>
                 <p>sources for this note:</p>
                 <ol>
@@ -58,7 +58,7 @@ const SubSectionDetails = () => {
                 <ViewNoteDetailsDialog name="View Note Details" 
                     noteContent={note.content}
                     noteId={note._id}
-                    noteCreatedBy={note.user.firstName + " "+ note.user.lastName} 
+                    noteCreatedBy={note?.user?.firstName + " "+ note?.user?.lastName} 
                     noteDateCreated={note.dateCreated}
                     noteSources={note.sources}
                 />
