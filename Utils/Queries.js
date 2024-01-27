@@ -101,9 +101,9 @@ export const joinProjectQuery = (projectObject) => {
 
 
 export const deleteProjectQuery = async(projectId) => {
-  projectId = Number(projectId)
   if (isOfflineMode()) {
     return db.transaction('rw', db.project, db.subSection, db.note, db.comment, db.tag, async () => {
+      projectId = Number(projectId)
       // First make sure that project exists
       const project = await db.project.get(projectId);
       if (!project) {
@@ -337,6 +337,15 @@ export const fetchNotesPerProjectId = async (projectId) => {
 export const fetchTagsPerProjectId = async (projectId) => {
   if (isOfflineMode()) {
     const tags = await db.tag.where("project").equals(Number(projectId)).toArray()
+    for (let tag of tags) {
+      if (tag.notes && tag.notes.length > 0) {
+        for (let i = 0; i < tag.notes.length; i++) {
+          let noteId = tag.notes[i];
+          let note = await db.note.get(noteId);
+          tag.notes[i] = note;
+        }
+      }
+    }
     return {
       tags
     }

@@ -7,10 +7,10 @@ export const isUserLeader = (userId) => {
 }
 
 export const setInvalidError = (setInvalid, error) => {
-  setInvalid({isInvalid:true,message:error.response.data.error})
+  setInvalid({isInvalid:true,message:error?.response?.data?.error || "There was an error with your request. Please try again later."})
   setTimeout(() => {
     setInvalid({isInvalid:false,message:""})
-  }, 4000);
+  }, 10000);
 }
 
 export const handleDeleteOneNote = (allProjectNotes, setAllProjectNotes, noteIdToBeDeleted, deleteNoteMutation) => {
@@ -41,7 +41,7 @@ export const handleDeleteOneSubSection = (subSections, setSubSections, subSectio
   })
 }
 
-export const handleNoteCommentSubmit = (data, noteId, createCommentMutation, setValue, setComments, comments, inReplyTo = null) => {
+export const handleNoteCommentSubmit = (data, noteId, createCommentMutation, setValue, setComments, comments, closeReplyModal, inReplyTo = null) => {
   const commentData = {
     content: data.noteComment,
     note: noteId,
@@ -49,6 +49,9 @@ export const handleNoteCommentSubmit = (data, noteId, createCommentMutation, set
   };
   createCommentMutation.mutate(commentData, {
     onSuccess: (data) => {
+      if(closeReplyModal) {
+        closeReplyModal()
+      }
       setValue("noteComment", "")
       setComments([...comments, data])
     }

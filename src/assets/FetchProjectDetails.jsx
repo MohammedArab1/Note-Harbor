@@ -3,6 +3,7 @@ import { useParams, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../customHooks/useAuth';
 import { fetchProjectById, fetchSubSectionsPerProjectId, fetchTagsPerProjectId, fetchAllNotesForProject } from '../../Utils/Queries';
 import { AppDataContext } from '../../context/AppDataContext';
+import {LoadingOverlay} from '@mantine/core'
 
 const FetchProjectDetails = () => {
 	const { project, setProject, subSections,setSubSections, tags, setTags, allProjectNotes, setAllProjectNotes } = useContext(AppDataContext);
@@ -30,6 +31,7 @@ const FetchProjectDetails = () => {
         //todo add error handling here
         if (projectId === undefined || projectId === null) return navigate("/UserHome")
         fetchProjectAndSubSectionsInUseEffect(projectId).then((data) => {
+            if (!data.project.project) return navigate("/UserHome")
             setProject(data.project.project);
             setSubSections(data.subsections);
         }).catch((error) => {
@@ -89,7 +91,7 @@ const FetchProjectDetails = () => {
     
     
     if(!queriesFinished || !projectFetched){
-        return <p>Loading...</p>
+        return <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
     }
     return (
         <Outlet/> 

@@ -1,13 +1,18 @@
 import * as Yup from 'yup'
+
+export const loginSchema = Yup.object().shape({
+  email: Yup.string().email().required(),
+  password: Yup.string().required()
+})
 export const registerSchema = Yup.object().shape({
   email: Yup.string().email().required(),
-  firstName: Yup.string().required(),
-  lastName: Yup.string().required(),
+  firstName: Yup.string().required("First name is a required field"),
+  lastName: Yup.string().required("Last name is a required field"),
   password: Yup.string()
-    .required("Password is required")
+    .required()
     .min(4, "Password length should be at least 4 characters"),
   cpassword: Yup.string()
-    .required("Confirm Password is required")
+    .required("Confirm password is a required field")
     .min(4, "Password length should be at least 4 characters")
     .oneOf([Yup.ref("password")], "Passwords do not match")
 });
@@ -22,7 +27,7 @@ export const JoinProjectSchema = Yup.object().shape({
 });
 
 export const createSubSectionSchema = Yup.object().shape({
-  name: Yup.string().required("Sub Section name is required"),
+  name: Yup.string().required("SubSection name is required"),
   description: Yup.string(),
 });
 

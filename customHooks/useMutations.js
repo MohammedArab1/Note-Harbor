@@ -16,7 +16,7 @@ import {
     createCommentQuery
     } from "../Utils/Queries"; 
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "./useAuth";
 import { setInvalidError } from "../Utils/Utils";
 import { useContext } from "react";
@@ -59,6 +59,7 @@ export const useMutations = () => {
             onSuccess: (data) => {
                 const user = {token:data.token,id:data.newUser._id,email:data.newUser.email,firstName:data.newUser.firstName,lastName:data.newUser.lastName}
                 login(user)
+                localStorage.setItem("offlineMode", false);
                 navigate('/UserHome')
             },
             onError:(error) => {

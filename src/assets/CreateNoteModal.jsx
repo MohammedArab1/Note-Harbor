@@ -1,40 +1,26 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import { TextField, FormControlLabel, Checkbox, Autocomplete } from '@mui/material';
-import Modal from '@mui/material/Modal';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createNoteSchema } from '../../Utils/yupSchemas';
 import { useMutations } from '../../customHooks/useMutations';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { AppDataContext } from '../../context/AppDataContext';
 import CreatableSelect from 'react-select/creatable';
 import chroma from 'chroma-js';
 import Select from 'react-select';
+import {Modal, Box, TextInput, rem, Button, Group, Alert, Transition, Title, LoadingOverlay, Checkbox, Flex, Autocomplete, MultiSelect} from '@mantine/core';
+import { GenericModal } from './GenericModal';
+import { IconInfoCircle } from '@tabler/icons-react';
+import { TagMultiSelect } from './TagMultiSelect';
+import ErrorAlert from './ErrorAlert';
 
-export const CreateNoteModal = ({projectId,subSectionId}) => {
+export const CreateNoteModal = ({projectId,subSectionId, opened, close}) => {
   const { allProjectNotes, setAllProjectNotes, tags, setTags } = React.useContext(AppDataContext)
-  const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: isScreenSmall ? '80%' : 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
   const {createNoteMutation,updateTagNoteMutation,invalid} = useMutations()
   const {register, handleSubmit, formState:{errors}, setValue, control} = useForm({
     resolver:yupResolver(createNoteSchema) 
   })
-  const [open, setOpen] = React.useState(false);
   const [uniqueSources, setUniqueSources] = React.useState([])
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [selectedTags, setSelectedTags] = React.useState([])
   const [addSource, setAddSource] = React.useState(false)
   const [userSourceInput, setUserSourceInput] = React.useState('')
   const [userAdditionalSourceInformationInput, setUserAdditionalSourceInformationInput] = React.useState('')
@@ -65,14 +51,13 @@ export const CreateNoteModal = ({projectId,subSectionId}) => {
       }
     }))
   }, [tags])
-  
   const handleCreateNote= async(data) => {
-    const {content, tagSelect} = data
+    const {content} = data
     createNoteMutation.mutate({content, projectId:projectId||null, subSectionId:subSectionId||null, sources:userSourceInput?[{source:userSourceInput, additionalSourceInformation:userAdditionalSourceInformationInput}]:[]}, {
       onSuccess: (data) => {
         setAllProjectNotes([...allProjectNotes, data])
-        if (tagSelect && tagSelect.length > 0){
-          updateTagNoteMutation.mutate({note:data._id, tagIds:tagSelect},{
+        if (selectedTags && selectedTags.length > 0){
+          updateTagNoteMutation.mutate({note:data._id, tagIds:selectedTags},{
             onSuccess:(data) => {
               const newTags = tags.map(tag => {
                 // Find the corresponding tag in the data array
@@ -89,7 +74,7 @@ export const CreateNoteModal = ({projectId,subSectionId}) => {
               setValue("content", "")
               setValue("source", "")
               setValue("additionalSourceInformation", "")
-              setValue("tagSelect", "")
+              setSelectedTags([])
               setAddSource(false)
             }
           })
@@ -105,55 +90,107 @@ export const CreateNoteModal = ({projectId,subSectionId}) => {
     })
   }
 
-
-  const dot = (color = 'transparent') => ({
-    alignItems: 'center',
-    display: 'flex',
-  
-    ':before': {
-      backgroundColor: color,
-      borderRadius: 10,
-      content: '" "',
-      display: 'block',
-      marginRight: 8,
-      height: 10,
-      width: 10,
-    },
-  });
-  const colourStyles = {
-    control: (styles) => ({ ...styles, backgroundColor: 'white' }),
-    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-      const color = chroma(data.color);
-      return {
-        ...styles,
-        backgroundColor: isDisabled
-          ? undefined
-          : isSelected
-          ? data.color
-          : isFocused
-          ? color.alpha(0.1).css()
-          : undefined,
-        cursor: isDisabled ? 'not-allowed' : 'default',
-  
-        ':active': {
-          ...styles[':active'],
-          backgroundColor: !isDisabled
-            ? isSelected
-              ? data.color
-              : color.alpha(0.3).css()
-            : undefined,
-        },
-        ...dot(data.color),
-      };
-    },
-    placeholder: (styles) => ({ ...styles, ...dot('#ccc') }),
-    multiValue: (styles, { data }) => ({ ...styles, ...dot(data.color) }),
-  };
-
-
   return (
     <div>
-        <Button onClick={handleOpen}>Create a note</Button>
+      <GenericModal opened={opened} close={close} title="Create a note">
+        <form onSubmit={handleSubmit((data)=>{handleCreateNote(data)})}>
+          {createNoteMutation.isFetching && <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />}
+          {/* <Transition
+          mounted={invalid.isInvalid}
+          transition="fade"
+          duration={400}
+          timingFunction="ease">
+              {(styles) => 
+              <div style={styles}>
+                  <Alert variant="light" color="red" title="Problem with creating project" icon={<IconInfoCircle />}>
+                      {invalid.message}
+                  </Alert>
+              </div>}
+            </Transition> */}
+            <ErrorAlert invalid={invalid} title={"Problem with creating note"}/>
+            <TextInput
+              error={errors.content ? true : false}
+              placeholder={errors.content?.message || 'Your note content'}
+              withAsterisk
+              id="content"
+              label="Note content"
+              {...register("content")}
+              radius='md'
+            />
+            <Flex
+              mih={20}
+              mt={15}
+              gap="md"
+              justify="flex-start"
+              align="flex-start"
+              direction="row"
+              wrap="wrap"
+          >
+          <Checkbox id='addSource' checked={addSource} {...register("addSource")} onChange={handleAddSource} label="Add source" />
+          </Flex>
+          <Transition
+          mounted={addSource}
+          transition="fade"
+          duration={400}
+          timingFunction="ease">
+            {(styles) =>   
+              <div style={styles}>
+                <Autocomplete
+                  label="Source"
+                  id="source"
+                  withAsterisk
+                  data={uniqueSources.map((source) => source.source)}
+                  value={userSourceInput || ''}
+                  // onChange={setUserSourceInput}
+                  onChange={(value) => {
+                    setUserSourceInput(value);
+                    setValue("source", value);
+                  }}
+                  comboboxProps={{ transitionProps: { transition: 'pop', duration: 200 } }}
+                  error={errors?.source ? true : false}
+                  placeholder={errors.source?.message || 'Your source here'} 
+                  // {...register("source")}
+                />
+                <TextInput
+                  placeholder={'Your additional source information here'}
+                  id="additionalSourceInformation"
+                  label="Additional Source Information"
+                  // {...register("additionalSourceInformation")}
+                  onChange={(event) => {
+                    setUserAdditionalSourceInformationInput(event.currentTarget.value);
+                    setValue("additionalSourceInformation", event.currentTarget.value);
+                  }}
+                />
+
+                {/* <CreatableMultiSelect 
+                selectData={uniqueSources.map((source) => source.source)}
+                value={userSourceInput || []}
+                setValue={setUserSourceInput}
+                label={'Source'}
+                error={errors?.source ? true : false}
+                id='source'
+                // {...register("source")}
+                register={register}
+                registerValue={'source'}
+                /> */}
+              </div>}
+          </Transition>
+          {/* } */}
+          {/* <Flex
+            m={15}
+            justify="flex-start"
+            align="flex-start"
+            direction="row"
+            wrap="wrap"
+          > */}
+          <Box my={15}>
+              <TagMultiSelect value={selectedTags} setValue={setSelectedTags} tagData={selectValues}/>
+          </Box>
+          {/* </Flex> */}
+          <Button variant="text" type="submit">Create Note</Button>
+        </form>
+      </GenericModal>
+        {/* <Button onClick={handleOpen}>Create a note</Button>
         <Modal
         open={open}
         onClose={handleClose}
@@ -229,7 +266,7 @@ export const CreateNoteModal = ({projectId,subSectionId}) => {
                 <br />
                 <Button variant="text" type="submit">Create Note</Button>
             </Box>
-        </Modal>
+        </Modal> */}
     </div>
     );
 }

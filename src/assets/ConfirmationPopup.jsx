@@ -1,47 +1,41 @@
 import React, { useState } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import {Button, Text, Group} from '@mantine/core';
+import { GenericModal } from './GenericModal';
+import { useDisclosure } from '@mantine/hooks';
 
-const ConfirmationPopup = ({ name, message, onConfirm }) => {
-const [open, setOpen] = useState(false);
+const ConfirmationPopup = ({ title, message, onConfirm, actionComponent }) => {
 
-const handleOpen = () => {
-    setOpen(true);
-};
-
-const handleClose = () => {
-    setOpen(false);
-};
+const [isModalOpened, isModalOpenedHandler] = useDisclosure(false);
 
 const handleConfirm = () => {
     onConfirm();
-    handleClose();
+    isModalOpenedHandler.close();
 };
 
+const actionComponentWithOnClick = React.cloneElement(actionComponent, { onClick: (e)=>{isModalOpenedHandler.open()} });
+
 return (
-    <div>
-        <Button variant="text" color="primary" onClick={handleOpen}>
-            {name}
-        </Button>
-        <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>Confirmation</DialogTitle>
-            <DialogContent>
-            <DialogContentText>{message}</DialogContentText>
-            </DialogContent>
-            <DialogActions>
-            <Button onClick={handleClose} color="primary">
-                Cancel
-            </Button>
-            <Button onClick={handleConfirm} color="primary" autoFocus>
-                Confirm
-            </Button>
-            </DialogActions>
-        </Dialog>
-    </div>
+    <>
+        {actionComponentWithOnClick}
+        <GenericModal 
+        opened={isModalOpened} 
+        close={isModalOpenedHandler.close} 
+        title={title} 
+        bgColor={'#DDDFE0'}>
+        <>
+            {message || 
+            <Text>
+                {message}
+            </Text>
+            }
+            <Group justify="flex-end">
+                <Button onClick={(e) => isModalOpenedHandler.close()} variant="default">Cancel</Button>
+                <Button onClick={(e) => handleConfirm(e)}>Confirm</Button>
+            </Group>
+            
+        </>
+        </GenericModal>
+    </>
 );
 };
 

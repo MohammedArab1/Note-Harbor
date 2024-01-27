@@ -1,37 +1,18 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import { TextField } from '@mui/material';
-import Modal from '@mui/material/Modal';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createSubSectionSchema } from '../../Utils/yupSchemas';
 import { useMutations } from '../../customHooks/useMutations';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { GenericModal } from './GenericModal';
+import {TextInput, Button, Flex } from '@mantine/core';
+import ErrorAlert from './ErrorAlert';
 
+export const CreateSubSectionModal = ({subSections,setSubSections, projectId, opened,close}) => {
 
-export const CreateSubSectionModal = ({subSections,setSubSections, projectId}) => {
-
-  const isScreenSmall = useMediaQuery(theme => theme.breakpoints.down('sm'));
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: isScreenSmall ? '80%' : 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
   const {createSubSectionMutation, invalid} = useMutations()
   const {register, handleSubmit, formState:{errors}, setValue, control} = useForm({
     resolver:yupResolver(createSubSectionSchema) 
   })
-
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   const handleCreateSubSection= async(data) => {
     var {name, description} = data
@@ -45,8 +26,40 @@ export const CreateSubSectionModal = ({subSections,setSubSections, projectId}) =
     })
   }
   return (
-    <div>
-        <Button onClick={handleOpen}>Create a sub section</Button>
+    <>
+      <GenericModal opened={opened} close={close} title="Create a subsection">
+        <form onSubmit={handleSubmit((data)=>{handleCreateSubSection(data)})}>
+          {createSubSectionMutation.isLoading && <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />}
+          <ErrorAlert invalid={invalid} title={"Problem with creating subsection"}/>
+          <TextInput 
+              error={errors.name ? true : false}
+              placeholder={errors.name?.message || 'Your subsection name'}
+              withAsterisk
+              id="name"
+              label="Subsection name"
+              {...register("name")}
+              radius='md'
+          /> 
+          <TextInput
+              error={errors.description ? true : false}
+              placeholder={errors.description?.message || 'Your subsection description'}
+              id="description"
+              label="Subsection description"
+              {...register("description")}
+              radius='md'
+          />
+          <Flex
+            mt={15}
+            gap="md"
+            justify="center"
+            direction="row"
+            wrap="wrap"
+          >
+          <Button variant="text" type="submit">Create sub section</Button>  
+          </Flex>
+        </form>
+      </GenericModal>
+        {/* <Button onClick={handleOpen}>Create a sub section</Button>
         <Modal
         open={open}
         onClose={handleClose}
@@ -78,7 +91,7 @@ export const CreateSubSectionModal = ({subSections,setSubSections, projectId}) =
 
                 <Button variant="text" type="submit">Create sub section</Button>
             </Box>
-        </Modal>
-    </div>
+        </Modal> */}
+    </>
     );
 }

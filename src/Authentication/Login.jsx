@@ -38,7 +38,7 @@ const Login = () => {
           id="password"
           label="Password"
           type="password"
-          autoComplete="current-password"
+          autoComplete="new-password"
           required
           {...register("password")}
         />
