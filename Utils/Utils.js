@@ -65,3 +65,15 @@ export const isOfflineMode = () => {
   }
   return offlineMode === "true"
 };
+
+export const getUniqueSources = (allProjectNotes) => {
+  const allSources = allProjectNotes.reduce((accumulator, note) => {
+    return accumulator.concat(note.sources);
+  }, []);
+  const calculatedUniqueSources = allSources.filter((source, index, self) =>  
+  index === self.findIndex((t) => (
+        t.source === source.source
+    ))
+  );
+  return calculatedUniqueSources
+}

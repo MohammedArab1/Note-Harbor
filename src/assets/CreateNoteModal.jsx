@@ -12,6 +12,7 @@ import { GenericModal } from './GenericModal';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { TagMultiSelect } from './TagMultiSelect';
 import ErrorAlert from './ErrorAlert';
+import { getUniqueSources } from '../../Utils/Utils';
 
 export const CreateNoteModal = ({projectId,subSectionId, opened, close}) => {
   const { allProjectNotes, setAllProjectNotes, tags, setTags } = React.useContext(AppDataContext)
@@ -30,15 +31,7 @@ export const CreateNoteModal = ({projectId,subSectionId, opened, close}) => {
   }
 
   React.useEffect(() => {
-    const allSources = allProjectNotes.reduce((accumulator, note) => {
-      return accumulator.concat(note.sources);
-    }, []);
-    const calculatedUniqueSources = allSources.filter((source, index, self) =>  
-      index === self.findIndex((t) => (
-            t.source === source.source
-        ))
-    );
-    setUniqueSources(calculatedUniqueSources)
+    setUniqueSources(getUniqueSources(allProjectNotes))
   }, [allProjectNotes])
   
 

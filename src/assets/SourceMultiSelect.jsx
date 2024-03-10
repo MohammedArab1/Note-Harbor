@@ -10,56 +10,54 @@ import {
 	Flex,
 	Grid,
 	Checkbox,
-	ScrollArea
+	ScrollArea,
 } from '@mantine/core';
 import { useState } from 'react';
 import { TagOptionPill } from './TagOptionPill';
-import {IconCircleFilled, IconCheck} from '@tabler/icons-react';
+import { IconCircleFilled, IconCheck } from '@tabler/icons-react';
 import classes from '../../styles/TagPill.module.css';
+import { SourceOptionPill } from './SourceOptionPill';
 
-export function TagMultiSelect({value, setValue,tagData}) {
+export function SourceMultiSelect({ value, setValue, sourceData }) {
 	const combobox = useCombobox({
 		onDropdownClose: () => combobox.resetSelectedOption(),
 		onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
 	});
-
 	const handleValueSelect = (val) => {
-		value.includes(val) ? setValue(value.filter((v) => v !== val)) : setValue([...value, val])
-	}
+        value.includes(val) ? setValue(value.filter((v) => v !== val)) : setValue([...value, val])
+	};
 
 	const handleValueRemove = (val) =>
-		setValue(value.filter((v) => v !== val))
-	
-	
-	const values = value.map((item) => (
-		tagData.map((tag) => {
-			if (tag.value === item) {
+        setValue(value.filter((v) => v !== val))
+	const values = value.map((item) =>
+		sourceData.map((source) => {
+			if (source.source === item) {
 				return (
-				<TagOptionPill
-				tag={tag}
-				key={item}
-				value={item}
-				onRemove={() => handleValueRemove(item)}
-			>
-				{item}
-			</TagOptionPill>
-			)}
+					<SourceOptionPill
+                    sourceText={item}
+					key={item}
+					value={item}
+					onRemove={() => handleValueRemove(item)}
+					>
+					{item}
+					</SourceOptionPill>
+				);
+			}
 		})
-		
-	));
+	);
 	const dot = (color = 'transparent') => ({
 		'--dot-color': color,
 	});
 
-	const options = tagData.map((item) => {
+	const options = sourceData.map((item) => {
 		return (
-			<Combobox.Option 
-				value={item.value}
-				key={item.value}
-				active={value.includes(item.value)}
+			<Combobox.Option
+				value={item.source}
+				key={item.source}
+				active={value.includes(item.source)}
 			>
 				<Group gap="sm">
-				{/* <Flex
+					{/* <Flex
 					mih={20}
 					mt={15}
 					gap="md"
@@ -76,24 +74,28 @@ export function TagMultiSelect({value, setValue,tagData}) {
 						tabIndex={-1}
 						style={{ pointerEvents: 'none' }}
 					/> */}
-					<span className={classes.dot} style={dot(item.color)}>{item.label}</span>
-				{/* </Flex> */}
+					<span>{item.source}</span>
+					{/* </Flex> */}
 				</Group>
 			</Combobox.Option>
 		);
 	});
 
 	return (
-		<Combobox 
+		<Combobox
 			store={combobox}
 			onOptionSubmit={handleValueSelect}
 			zIndex={9000}
 			withinPortal={true}
 			transitionProps={{ duration: 200, transition: 'pop' }}
 		>
-			<Combobox.DropdownTarget >
-				<PillsInput pointer onClick={() => combobox.toggleDropdown()} label="Pick one or many tags" >
-					<Pill.Group >
+			<Combobox.DropdownTarget>
+				<PillsInput
+					pointer
+					onClick={() => combobox.toggleDropdown()}
+					label="Pick one or many sources"
+				>
+					<Pill.Group>
 						{values.length > 0 ? (
 							values
 						) : (

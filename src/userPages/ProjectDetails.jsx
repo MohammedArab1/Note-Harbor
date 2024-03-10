@@ -25,17 +25,27 @@ import {
   Button,
   Image,
   Center,
-  ActionIcon
+  ActionIcon,
+  TextInput
 } from '@mantine/core';
 import {IconArrowBarLeft} from '@tabler/icons-react';
 import { format } from "date-fns"
 import {motion} from "framer-motion"
 import { useDisclosure } from "@mantine/hooks";
 import { TagsDetailModal} from "../assets/TagsDetailModal"
+import { getUniqueSources } from "../../Utils/Utils"
+import { SourceMultiSelect } from "../assets/SourceMultiSelect"
+import { TagMultiSelect } from "../assets/TagMultiSelect"
 
 const ProjectDetails = () => {
   const { tags, setTags, allProjectNotes, setAllProjectNotes, project, setProject, subSections,setSubSections } = useContext(AppDataContext)
   const [uniqueSources, setUniqueSources] = useState([])
+  const [selectTags, setSelectTags] = useState([])
+  const [filterValues, setFilterValues] = useState({
+    searchString: "",
+    selectedSources: [],
+    selectedTags: []
+  })
   const [createNoteModalOpened, createNoteModalHandler] = useDisclosure(false);
   const [viewTagsModalOpened, viewTagsModalHandler] = useDisclosure(false);
   const [createTagModalOpened, createTagModalHandler] = useDisclosure(false);
@@ -59,18 +69,18 @@ const ProjectDetails = () => {
     navigate(`/ProjectDetails/${projectId}/SubSectionDetails/${subSection._id}`)
   }
   useEffect(() => {
-    const allSources = allProjectNotes.reduce((accumulator, note) => {
-      return accumulator.concat(note.sources);
-    }, []);
-    const uniqueSources = allSources.filter((source, index, self) =>
-        index === self.findIndex((t) => (
-            t.source === source.source
-        ))
-    );
-    setUniqueSources(uniqueSources)
+    setUniqueSources(getUniqueSources(allProjectNotes))
     setNotes(allProjectNotes.filter((x)=>{return x.project!=null}))
   }, [allProjectNotes])
-
+  useEffect(() => {
+    setSelectTags(tags.map((tag) => {
+      return {
+        value: tag._id,
+        label: tag.tagName,
+        color: tag.colour,
+      }
+    }))
+  }, [tags])
   const breadcrumbs = [{ title: 'Home', href: '/UserHome' },{title:`${project.projectName}`,href:`/ProjectDetails/${project._id}`}].map(
 		(item, index) => (
 			<Link to={item.href} key={index}>
@@ -191,7 +201,28 @@ const ProjectDetails = () => {
           {/* </Center> */}
         </Grid.Col>
         <Grid.Col span={{base:'auto'}} >
-          <p>test grid col span 3</p>
+          <Title ta="center" order={2}>Filters</Title>
+          <TextInput
+              placeholder={'Your search filter here...'}
+              id="searchString"
+              label="Search for notes by content"
+              radius='md'
+              onChange={(e) => {
+                setFilterValues({...filterValues,searchString:e.target.value})
+              }}
+            />
+          <SourceMultiSelect 
+            value={filterValues.selectedSources} 
+            setValue={(value)=>{
+              setFilterValues({...filterValues,selectedSources:value})
+            }} 
+            sourceData={uniqueSources}/>
+          <TagMultiSelect 
+            value={filterValues.selectedTags} 
+            setValue={(value)=>{
+              setFilterValues({...filterValues,selectedTags:value})
+            }} 
+            tagData={selectTags}/>
           <Flex
             mih={20}
             mt={15}
