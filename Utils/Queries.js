@@ -372,6 +372,12 @@ export const fetchAllNotesForProject = async (projectId,subsectionIds) => {
             .equals(Number(projectId))
             .toArray();
     }
+    const tags = await db.tag.where('project').equals(Number(projectId)).toArray()
+    for (let note of notes) {
+      note.tags = tags.filter(tag => tag.notes.some(noteId => {
+        return noteId === note._id
+      }))
+    }
     return notes
   }
   return axios.post(`${baseUrl}/note/allNotes`,{projectId,subsectionIds})

@@ -26,7 +26,8 @@ import {
   Image,
   Center,
   ActionIcon,
-  TextInput
+  TextInput,
+  Transition
 } from '@mantine/core';
 import {IconArrowBarLeft} from '@tabler/icons-react';
 import { format } from "date-fns"
@@ -36,10 +37,12 @@ import { TagsDetailModal} from "../assets/TagsDetailModal"
 import { getUniqueSources } from "../../Utils/Utils"
 import { SourceMultiSelect } from "../assets/SourceMultiSelect"
 import { TagMultiSelect } from "../assets/TagMultiSelect"
+import { applyFilter } from "../../Utils/Utils"
 
 const ProjectDetails = () => {
   const { tags, setTags, allProjectNotes, setAllProjectNotes, project, setProject, subSections,setSubSections } = useContext(AppDataContext)
   const [uniqueSources, setUniqueSources] = useState([])
+  const [searching, setSearching] = useState(false)
   const [selectTags, setSelectTags] = useState([])
   const [filterValues, setFilterValues] = useState({
     searchString: "",
@@ -147,14 +150,15 @@ const ProjectDetails = () => {
           <Title order={2} mt={'lg'}>Notes</Title>
           <Grid mt={'lg'}>
             {notes?.map((note,i) => {
-              const noteTags = tags.filter(tag => tag.notes.some(n => n._id === note._id));
+              // const noteTags = tags.filter(tag => tag.notes.some(n => n._id === note._id));
               return (
               <Grid.Col span={{ base: 12, md: 6 }} key={i}  >
                 <ViewNoteDetailsDialog
                     noteContent={note.content}
                     noteId={note._id}
                     noteSources={note.sources}
-                    noteTags={noteTags}
+                    // noteTags={noteTags}
+                    noteTags={note.tags}
                     actionComponent={
                       <NoteDetailsCard noteDateCreated={note.dateCreated} noteCreatedBy={note.user?.firstName ? (note.user?.firstName + " "+ note.user?.lastName) : ""} noteContent={note.content}>
                       </NoteDetailsCard>
@@ -207,6 +211,7 @@ const ProjectDetails = () => {
               id="searchString"
               label="Search for notes by content"
               radius='md'
+              value={filterValues.searchString}
               onChange={(e) => {
                 setFilterValues({...filterValues,searchString:e.target.value})
               }}
@@ -223,6 +228,30 @@ const ProjectDetails = () => {
               setFilterValues({...filterValues,selectedTags:value})
             }} 
             tagData={selectTags}/>
+          <br />
+          <Flex
+            mih={20}
+            mt={15}
+            gap="md"
+            justify="space-between"
+            align="flex-start"
+            direction="row"
+            wrap="wrap"
+          >
+            <Button onClick={()=>{
+                setSearching(true)
+                setNotes(applyFilter(allProjectNotes,filterValues))
+                setSearching(false)
+              }}>
+                Search
+            </Button>
+            <Button onClick={()=>{
+              setFilterValues({searchString:"",selectedSources:[],selectedTags:[]})
+              setNotes(allProjectNotes.filter((x)=>{return x.project!=null}))
+              }}
+              >Clear Filters</Button>
+          </Flex>
+          <LoadingOverlay visible={searching} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
           <Flex
             mih={20}
             mt={15}

@@ -77,3 +77,22 @@ export const getUniqueSources = (allProjectNotes) => {
   );
   return calculatedUniqueSources
 }
+
+export const applyFilter = (allProjectNotes, filter) => {
+  if (!filter.searchString && filter.selectedSources.length === 0 && filter.selectedTags.length === 0) {
+    return allProjectNotes
+  }
+  const filteredNotes = allProjectNotes.filter((note) => {
+    if (filter.selectedSources.length > 0 && note.sources.filter((source) => filter.selectedSources.includes(source.source) ).length === 0) {
+      return false
+    }
+    if (filter.selectedTags && filter.selectedTags.length > 0 && filter.selectedTags.filter((tag) => note.tags.map(note=>note._id).includes(tag)).length === 0) {
+      return false
+    }
+    if (filter.searchString && filter.searchString.length > 0 && !(note.content.toLowerCase().includes(filter.searchString.toLowerCase()))) {
+      return false
+    }
+    return true
+  })
+  return filteredNotes
+}
