@@ -143,7 +143,7 @@ const Main = () => {
         <Box w='20rem' h='20rem' visibleFrom="sm">
           <Image
             radius="md"
-            src="../images/HomePageSVG.svg"
+            src="/HomePageSVG.svg"
             
           />
         </Box>
@@ -190,7 +190,7 @@ const Main = () => {
                   alt="Start a new project"
                 /> */}
                 <Image
-                src="../images/HomePage-HowToUse-Image1.svg"
+                src="/HomePage-HowToUse-Image1.svg"
                 fit="contain"
                 alt="Start a new project"
               />  
@@ -203,7 +203,7 @@ const Main = () => {
           </Text>
         </Card>
         <Image
-          src="../images/arrowRight.svg"
+          src="/arrowRight.svg"
           h={200}
           w={100}
           fit="contain"
@@ -220,7 +220,7 @@ const Main = () => {
             <Center>
               <AspectRatio ratio={1} w='60%'>
                 <Image
-                  src="../images/HomePage-HowToUse-Image2.svg"
+                  src="/HomePage-HowToUse-Image2.svg"
                   fit="contain"
                   alt="Start a new project"
                 />
@@ -233,7 +233,7 @@ const Main = () => {
           </Text>
         </Card>
         <Image
-          src="../images/arrowRight.svg"
+          src="/arrowRight.svg"
           h={200}
           w={100}
           fit="contain"
@@ -251,7 +251,7 @@ const Main = () => {
             <Center>
               <AspectRatio ratio={1} w='60%'>
                 <Image
-                  src="../images/HomePage-HowToUse-Image3.svg"
+                  src="/HomePage-HowToUse-Image3.svg"
                   fit="contain"
                   alt="Start a new project"
                 />
@@ -294,7 +294,7 @@ const Main = () => {
                   alt="Start a new project"
                 /> */}
                 <Image
-                src="../images/HomePage-HowToUse-Image1.svg"
+                src="/HomePage-HowToUse-Image1.svg"
                 fit="contain"
                 alt="Start a new project"
               />  
@@ -316,11 +316,11 @@ const Main = () => {
           direction="row"
           hiddenFrom="md">
         <Image
-          src="../images/arrowDown.svg"
+          src="/arrowDown.svg"
           h={200}
           w={100}
           fit="contain"
-          alt="arrow to the right"
+          alt="arrow down"
         />
         </Flex>
         <Flex
@@ -342,7 +342,7 @@ const Main = () => {
             <Center>
               <AspectRatio ratio={1} w='60%'>
                 <Image
-                  src="../images/HomePage-HowToUse-Image2.svg"
+                  src="/HomePage-HowToUse-Image2.svg"
                   fit="contain"
                   alt="Start a new project"
                 />
@@ -364,7 +364,7 @@ const Main = () => {
           direction="row"
           hiddenFrom="md">
         <Image
-          src="../images/arrowDown.svg"
+          src="/arrowDown.svg"
           h={200}
           w={100}
           fit="contain"
@@ -391,7 +391,7 @@ const Main = () => {
             <Center>
               <AspectRatio ratio={1} w='60%'>
                 <Image
-                  src="../images/HomePage-HowToUse-Image3.svg"
+                  src="/HomePage-HowToUse-Image3.svg"
                   fit="contain"
                   alt="Start a new project"
                 />

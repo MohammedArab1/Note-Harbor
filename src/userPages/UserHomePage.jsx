@@ -140,7 +140,7 @@ const UserHomePage = () => {
                 <Center maw='100%' h='100%'>
                   <Image
                     radius="md"
-                    src="../images/UserHomePageNoProjects.svg"
+                    src="/UserHomePageNoProjects.svg"
                     
                   />
                 </Center>
