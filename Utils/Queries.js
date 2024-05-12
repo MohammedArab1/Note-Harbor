@@ -4,8 +4,10 @@ import { db } from '../offlineDB/db';
 import { useLiveQuery } from "dexie-react-hooks";
 import { isOfflineMode } from './Utils';
 
-const baseUrl = import.meta.env.VITE_REACT_APP_API_URL
-
+var baseUrl = import.meta.env.VITE_REACT_APP_API_URL
+if (import.meta.env.PROD) {
+  baseUrl = "/api"
+}
 
 // Request interceptors for API calls. This will add the token to the header of every request
 axios.interceptors.request.use(
