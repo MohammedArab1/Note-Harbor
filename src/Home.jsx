@@ -1,15 +1,12 @@
-import { Link } from "react-router-dom"
-import { Flex, Button, Title, Space, Text, Image, Card, Divider, Center, AspectRatio, Anchor, Box, Group } from '@mantine/core';
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "../customHooks/useAuth";
+import { Anchor, AspectRatio, Box, Button, Card, Center, Divider, Flex, Image, Text, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { IconBrandGithub } from "@tabler/icons-react";
-import {motion} from "framer-motion"
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../customHooks/useAuth";
+import ConfirmationPopup from "./assets/ConfirmationPopup";
 import { LoginButton } from "./assets/LoginButton";
 import { RegisterButton } from "./assets/RegisterButton";
-import { modals } from '@mantine/modals';
-import { useDisclosure } from '@mantine/hooks';
-import { GenericModal } from "./assets/GenericModal";
-import ConfirmationPopup from "./assets/ConfirmationPopup";
 
 const Main = () => {
   const [offlineModalOpened, offlineModalHandler] = useDisclosure(false);
@@ -73,7 +70,7 @@ const Main = () => {
         direction="row"
         wrap="wrap"
       >
-        <Title ff="Libre Baskerville" fw={400} order={1}>TitlePlaceholder</Title>
+        <Title ff="Libre Baskerville" fw={400} order={1}>Note Harbor</Title>
       </Flex>
       {/* <Space h="xl" /> */}
       <Flex
@@ -137,7 +134,7 @@ const Main = () => {
       >
         <Box w='20rem' h='20rem'>
           <Text size="xl">
-          TitlePlaceholder is a web application created to help you write down notes, along with their sources, and tag them when conducting research projects. It is meant to help you stay organized and fetch only the notes you want to look at when you’re reviewing.
+          Note Harbor is a web application created to help you write down notes, along with their sources, and tag them when conducting research projects. It is meant to help you stay organized and fetch only the notes you want to look at when you’re reviewing.
           </Text>
         </Box>
         <Box w='20rem' h='20rem' visibleFrom="sm">
@@ -408,12 +405,26 @@ const Main = () => {
         mt='5rem'
         mih={50}
         gap="md"
-        justify="space-between"
+        justify="center"
+        align="flex-start"
+        direction="row">
+        <Image
+            src="/logo.svg"
+            h={200}
+            w={200}
+            alt="logo"
+          />
+        
+      </Flex>
+      <Flex
+        mt='5rem'
+        mih={50}
+        gap="md"
+        justify="end"
         align="flex-start"
         direction="row">
         <div></div>
-        <Text>LOGO</Text> 
-        <Anchor href="https://github.com/MohammedArab1/MeetupScheduler" target="_blank" c='black'><IconBrandGithub stroke={1.5} /></Anchor>
+        <Anchor href="https://github.com/MohammedArab1/MeetupScheduler" target="_blank" c='black' ><IconBrandGithub stroke={1.5} /></Anchor>
       </Flex>
       
     </motion.div>

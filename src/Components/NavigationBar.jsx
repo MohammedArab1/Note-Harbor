@@ -58,7 +58,7 @@ const NavigationBar= () => {
         <header className={classes.header}>
         <div className={classes.inner}>
           <Group gap={1} visibleFrom="xs">
-            <Text onClick={(e) => {onGenericClick(e,'/')}} mr={10}>LOGO</Text> 
+            <Text onClick={(e) => {onGenericClick(e,'/')}} mr={10}>Note Harbor</Text> 
             {/* <Divider orientation="vertical" mr={10} ml={10} />
             {items} */}
           </Group>
@@ -126,7 +126,7 @@ const NavigationBar= () => {
       <header className={classes.header}>
         <div className={classes.inner}>
           <Group gap={1} visibleFrom="xs">
-            <Text onClick={(e) => {onGenericClick(e,'/')}} mr={10}>LOGO</Text> 
+            <Text onClick={(e) => {onGenericClick(e,'/')}} mr={10}>Note Harbor</Text> 
             {/* <Divider orientation="vertical" mr={10} ml={10} />
             {items} */}
           </Group>
@@ -142,7 +142,7 @@ const NavigationBar= () => {
             onClose={toggle}
             size="100%"
             padding="md"
-            title="LOGO"
+            title="Note Harbor"
             hiddenFrom="xs"
             zIndex={1000000}
             keepMounted={true}
