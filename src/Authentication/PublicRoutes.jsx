@@ -1,14 +1,12 @@
-import { Navigate, Outlet, useNavigate} from "react-router-dom"
-import { useAuth } from "../../customHooks/useAuth"
-import { isOfflineMode } from "../../Utils/Utils"
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../../customHooks/useAuth';
+import { isOfflineMode } from '../../Utils/Utils';
 
 const PublicRoutes = () => {
-  const {user, isLoading} = useAuth()
+	const { user, isLoading } = useAuth();
 
-  if(isLoading) return <p>Loading...</p>
-  return (
-    (!user && !isOfflineMode()) ? <Outlet/> : <Navigate to="/UserHome"/>
-  )
-}
+	if (isLoading) return <p>Loading...</p>;
+	return !user && !isOfflineMode() ? <Outlet /> : <Navigate to="/UserHome" />;
+};
 
-export default PublicRoutes
+export default PublicRoutes;
