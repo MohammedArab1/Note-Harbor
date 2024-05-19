@@ -27,14 +27,13 @@ import { Filter } from '../Components/Filter';
 import NoteDetailsCard from '../Components/NoteDetailsCard';
 import { TagsDetailModal } from '../Components/TagsDetailModal';
 import ViewNoteDetailsDialog from '../Components/ViewNoteDetailsDialog';
+import { SubSectionCard } from '../Components/SubSectionCard';
 const ProjectDetails = () => {
 	const {
 		tags,
 		setTags,
 		allProjectNotes,
-		setAllProjectNotes,
 		project,
-		setProject,
 		subSections,
 		setSubSections,
 	} = useContext(AppDataContext);
@@ -130,34 +129,7 @@ const ProjectDetails = () => {
 						{subSections.map((subsection, i) => {
 							return (
 								<Grid.Col span={{ base: 12, md: 6 }} key={i}>
-									<Card
-										shadow="sm"
-										padding="lg"
-										radius="md"
-										withBorder
-										component={Link}
-										to={`/ProjectDetails/${projectId}/SubSectionDetails/${subsection._id}`}
-										h="100%"
-										w="100%"
-										c="gray"
-									>
-										<Group>
-											<Text truncate="end" fw={500}>
-												{subsection.name}
-											</Text>
-										</Group>
-										<Divider mt="sm" mb="md" />
-										<Box maw="100%">
-											<Text
-												lineClamp={3}
-												size="sm"
-												c="dimmed"
-												styles={{ root: { wordBreak: 'break-word' } }}
-											>
-												{subsection.description || 'No description'}
-											</Text>
-										</Box>
-									</Card>
+									<SubSectionCard projectId={projectId} subsection={subsection}/>
 								</Grid.Col>
 							);
 						})}
@@ -182,13 +154,16 @@ const ProjectDetails = () => {
 					</Title>
 					<Grid mt={'lg'}>
 						{notes?.map((note, i) => {
+							const noteTags = tags.filter((tag) =>
+								tag.notes.some((n) => n._id === note._id)
+							);
 							return (
 								<Grid.Col span={{ base: 12, md: 6 }} key={i}>
 									<ViewNoteDetailsDialog
 										noteContent={note.content}
 										noteId={note._id}
 										noteSources={note.sources}
-										noteTags={note.tags}
+										noteTags={noteTags}
 										actionComponent={
 											<NoteDetailsCard
 												noteDateCreated={note.dateCreated}
