@@ -1,20 +1,18 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
-	Alert,
 	Button,
 	Checkbox,
 	Flex,
 	Group,
 	LoadingOverlay,
 	TextInput,
-	Transition,
 } from '@mantine/core';
-import { IconInfoCircle } from '@tabler/icons-react';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { createProjectSchema } from '../../Utils/yupSchemas';
 import { useAuth } from '../../customHooks/useAuth';
 import { useMutations } from '../../customHooks/useMutations';
+import ErrorAlert from './ErrorAlert';
 import { GenericModal } from './GenericModal';
 
 export const CreateProjectModal = ({
@@ -63,25 +61,10 @@ export const CreateProjectModal = ({
 							overlayProps={{ radius: 'sm', blur: 2 }}
 						/>
 					)}
-					<Transition
-						mounted={invalid.isInvalid}
-						transition="fade"
-						duration={400}
-						timingFunction="ease"
-					>
-						{(styles) => (
-							<div style={styles}>
-								<Alert
-									variant="light"
-									color="red"
-									title="Problem with creating project"
-									icon={<IconInfoCircle />}
-								>
-									{invalid.message}
-								</Alert>
-							</div>
-						)}
-					</Transition>
+					<ErrorAlert
+						invalid={invalid}
+						title={'Problem with creating project'}
+					/>
 					<TextInput
 						error={errors.projectName ? true : false}
 						placeholder={errors.projectName?.message || 'Your project name'}

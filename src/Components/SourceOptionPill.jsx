@@ -3,7 +3,7 @@ import classes from '../../styles/TagPill.module.css';
 export function SourceOptionPill({ sourceText, onRemove, ...others }) {
 	return (
 		<div className={classes.pill} {...others}>
-			<Text fz={'sm'} className={`${classes.dot} ${classes.label}`}>
+			<Text fz={'sm'} className={`${classes.label}`}>
 				{sourceText}
 			</Text>
 			<CloseButton

@@ -10,6 +10,7 @@ import { useMutations } from '../../customHooks/useMutations';
 import { handleDeleteOneSubSection } from '../../Utils/Utils';
 import ConfirmationPopup from '../Components/ConfirmationPopup';
 import { CreateNoteModal } from '../Components/CreateNoteModal';
+import { Filter } from '../Components/Filter';
 import NoteDetailsCard from '../Components/NoteDetailsCard';
 import ViewNoteDetailsDialog from '../Components/ViewNoteDetailsDialog';
 
@@ -29,6 +30,7 @@ const SubSectionDetails = () => {
 	const { subSectionId, projectId } = useParams();
 	const navigate = useNavigate();
 	const [subSection, setsubSection] = useState({});
+	const [subSectionNotes, setSubSectionNotes] = useState([]);
 	const [notes, setNotes] = useState([]);
 	const deleteSubsectionMessage = (
 		<Text m={10}>Are you sure you want to delete this Subsection?</Text>
@@ -51,8 +53,12 @@ const SubSectionDetails = () => {
 				return x.project == null && x.subSection == subSectionId;
 			})
 		);
+		setSubSectionNotes(
+			allProjectNotes.filter((x) => {
+				return x.project == null && x.subSection == subSectionId;
+			})
+		);
 	}, [allProjectNotes]);
-
 	const breadcrumbs = [
 		{ title: 'Home', href: '/UserHome' },
 		{ title: `${project.projectName}`, href: `/ProjectDetails/${project._id}` },
@@ -83,8 +89,10 @@ const SubSectionDetails = () => {
 				Go back
 			</Button>
 			<Grid columns={17}>
-				<Grid.Col span={{ base: 12 }} mt={'md'}>
-					<Title order={1}>{subSection.name}</Title>
+				<Grid.Col span={{ base: 'auto', md: 12 }} mt={'md'}>
+					<Title styles={{ root: { wordBreak: 'break-word' } }} order={1}>
+						{subSection.name}
+					</Title>
 					<Text
 						w={'100%'}
 						styles={{ root: { wordBreak: 'break-word' } }}
@@ -150,11 +158,12 @@ const SubSectionDetails = () => {
 						}
 					/>
 				</Grid.Col>
-				<Grid.Col span={{ base: 'content' }}>
+				<Grid.Col span={{ base: 'content' }} visibleFrom="md">
 					<Divider w="100%" h="100%" orientation="vertical" />
 				</Grid.Col>
-				<Grid.Col span={{ base: 'auto' }}>
-					<p>test grid col span 3</p>
+				<Grid.Col span={{ base: 'auto' }} visibleFrom="md">
+					{/* <Filter setNotes={setNotes}  containerNotes={allProjectNotes.filter((note)=>{return note.subSection == subSection._id })}></Filter> */}
+					<Filter setNotes={setNotes} containerNotes={subSectionNotes}></Filter>
 				</Grid.Col>
 			</Grid>
 		</motion.div>

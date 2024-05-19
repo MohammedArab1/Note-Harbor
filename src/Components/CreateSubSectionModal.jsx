@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Flex, TextInput } from '@mantine/core';
+import { Button, Group, TextInput } from '@mantine/core';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { createSubSectionSchema } from '../../Utils/yupSchemas';
@@ -20,7 +20,6 @@ export const CreateSubSectionModal = ({
 		handleSubmit,
 		formState: { errors },
 		setValue,
-		control,
 	} = useForm({
 		resolver: yupResolver(createSubSectionSchema),
 	});
@@ -40,7 +39,7 @@ export const CreateSubSectionModal = ({
 		);
 	};
 	return (
-		<>
+		<div>
 			<GenericModal opened={opened} close={close} title="Create a subsection">
 				<form
 					onSubmit={handleSubmit((data) => {
@@ -77,13 +76,15 @@ export const CreateSubSectionModal = ({
 						{...register('description')}
 						radius="md"
 					/>
-					<Flex mt={15} gap="md" justify="center" direction="row" wrap="wrap">
+					{/* <Flex mt={15} gap="md" justify="center" direction="row" wrap="wrap"> */}
+					<Group justify="center" mt="xl">
 						<Button variant="text" type="submit">
 							Create sub section
 						</Button>
-					</Flex>
+					</Group>
+					{/* </Flex> */}
 				</form>
 			</GenericModal>
-		</>
+		</div>
 	);
 };

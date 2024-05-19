@@ -104,9 +104,10 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 									setAddSource(false);
 								},
 							}
-						);
+						); // todo for some reason when creating note with tag, not registering the tag. So note has no tag on frontend (but registers in db, so if you reload page you see it)
+						//todo only happens on projectDetails page, not subsection details page
 					} else {
-						setOpen(false);
+						// setOpen(false);
 						setValue('content', '');
 						setValue('source', '');
 						setValue('additionalSourceInformation', '');

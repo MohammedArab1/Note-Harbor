@@ -167,7 +167,7 @@ const ViewNoteDetailsDialog = ({
 								<Divider my={'sm'} />
 							</>
 						)}
-						{noteTags.length > 0 && (
+						{noteTags?.length > 0 && (
 							<>
 								<Text truncate="end" size="sm" c="dimmed" mb={10}>
 									Tags
