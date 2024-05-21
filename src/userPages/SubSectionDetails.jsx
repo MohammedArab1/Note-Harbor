@@ -132,6 +132,7 @@ const SubSectionDetails = () => {
 						})}
 					</Grid>
 					<Button
+						mb={10}
 						mt={10}
 						onClick={(e) => {
 							createNoteModalHandler.open();
@@ -162,7 +163,6 @@ const SubSectionDetails = () => {
 					<Divider w="100%" h="100%" orientation="vertical" />
 				</Grid.Col>
 				<Grid.Col span={{ base: 'auto' }} visibleFrom="md">
-					{/* <Filter setNotes={setNotes}  containerNotes={allProjectNotes.filter((note)=>{return note.subSection == subSection._id })}></Filter> */}
 					<Filter setNotes={setNotes} containerNotes={subSectionNotes}></Filter>
 				</Grid.Col>
 			</Grid>
