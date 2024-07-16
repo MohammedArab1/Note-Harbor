@@ -72,7 +72,7 @@ export const LoginModal = ({ opened, close }) => {
 							</div>
 						)}
 					</Transition>
-					<Group justify="center" mt="xl">
+					{/* <Group justify="center" mt="xl">
 						<GoogleLogin
 							onSuccess={(credentialResponse) => {
 								const decodedJwt = jwt_decode(credentialResponse.credential);
@@ -87,7 +87,7 @@ export const LoginModal = ({ opened, close }) => {
 								setInvalidError(setInvalid, 'Error with Google Login');
 							}}
 						/>
-					</Group>
+					</Group> */}
 					<TextInput
 						autoComplete="email"
 						leftSection={atIcon}
