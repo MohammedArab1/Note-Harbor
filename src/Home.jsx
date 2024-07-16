@@ -18,7 +18,6 @@ import { useAuth } from '../customHooks/useAuth';
 import ConfirmationPopup from './Components/ConfirmationPopup';
 import { LoginButton } from './Components/LoginButton';
 import { RegisterButton } from './Components/RegisterButton';
-
 const Main = () => {
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();

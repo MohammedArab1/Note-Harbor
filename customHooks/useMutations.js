@@ -47,6 +47,7 @@ export const useMutations = () => {
 					email: data.user.email,
 					firstName: data.user.firstName,
 					lastName: data.user.lastName,
+					provider: data.user.authProvider
 				};
 				login(user);
 				localStorage.setItem('offlineMode', false);
@@ -188,5 +189,6 @@ export const useMutations = () => {
 		deleteTagMutation,
 		createCommentMutation,
 		invalid,
+		setInvalid
 	};
 };

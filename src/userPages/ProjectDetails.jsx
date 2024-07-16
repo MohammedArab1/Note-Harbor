@@ -1,12 +1,9 @@
 import {
-	Box,
 	Breadcrumbs,
 	Button,
-	Card,
 	Divider,
 	Flex,
 	Grid,
-	Group,
 	Text,
 	Title,
 } from '@mantine/core';
@@ -25,9 +22,9 @@ import { CreateSubSectionModal } from '../Components/CreateSubSectionModal';
 import { CreateTagModal } from '../Components/CreateTagModal';
 import { Filter } from '../Components/Filter';
 import NoteDetailsCard from '../Components/NoteDetailsCard';
+import { SubSectionCard } from '../Components/SubSectionCard';
 import { TagsDetailModal } from '../Components/TagsDetailModal';
 import ViewNoteDetailsDialog from '../Components/ViewNoteDetailsDialog';
-import { SubSectionCard } from '../Components/SubSectionCard';
 const ProjectDetails = () => {
 	const {
 		tags,
@@ -129,7 +126,10 @@ const ProjectDetails = () => {
 						{subSections.map((subsection, i) => {
 							return (
 								<Grid.Col span={{ base: 12, md: 6 }} key={i}>
-									<SubSectionCard projectId={projectId} subsection={subsection}/>
+									<SubSectionCard
+										projectId={projectId}
+										subsection={subsection}
+									/>
 								</Grid.Col>
 							);
 						})}

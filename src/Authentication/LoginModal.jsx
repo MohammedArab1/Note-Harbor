@@ -9,12 +9,14 @@ import {
 	Transition,
 	rem,
 } from '@mantine/core';
+import { GoogleLogin } from '@react-oauth/google';
 import { IconAt, IconInfoCircle, IconLock } from '@tabler/icons-react';
+import jwt_decode from 'jwt-decode';
 import { useForm } from 'react-hook-form';
 import { useMutations } from '../../customHooks/useMutations';
+import { setInvalidError } from '../../Utils/Utils';
 import { loginSchema } from '../../Utils/yupSchemas';
 import { GenericModal } from '../Components/GenericModal';
-
 export const LoginModal = ({ opened, close }) => {
 	const {
 		register,
@@ -23,7 +25,7 @@ export const LoginModal = ({ opened, close }) => {
 	} = useForm({
 		resolver: yupResolver(loginSchema),
 	});
-	const { loginMutation, invalid } = useMutations();
+	const { loginMutation, invalid, setInvalid } = useMutations();
 	const atIcon = <IconAt style={{ width: rem(16), height: rem(16) }} />;
 	const lockIcon = (
 		<IconLock style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
@@ -32,6 +34,9 @@ export const LoginModal = ({ opened, close }) => {
 	const handleLogin = async (data) => {
 		const { email, password } = data;
 		loginMutation.mutate({ password, email });
+	};
+	const handleGoogleLogin = async (data) => {
+		loginMutation.mutate(data);
 	};
 	return (
 		<>
@@ -67,6 +72,22 @@ export const LoginModal = ({ opened, close }) => {
 							</div>
 						)}
 					</Transition>
+					<Group justify="center" mt="xl">
+						<GoogleLogin
+							onSuccess={(credentialResponse) => {
+								const decodedJwt = jwt_decode(credentialResponse.credential);
+								handleGoogleLogin({
+									email: decodedJwt.email,
+									provider: 'google',
+									firstName: decodedJwt.given_name,
+									lastName: decodedJwt.family_name,
+								});
+							}}
+							onError={() => {
+								setInvalidError(setInvalid, 'Error with Google Login');
+							}}
+						/>
+					</Group>
 					<TextInput
 						autoComplete="email"
 						leftSection={atIcon}

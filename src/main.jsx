@@ -1,6 +1,7 @@
 import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { ModalsProvider } from '@mantine/modals';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -52,11 +53,13 @@ const theme = createTheme({
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<MantineProvider theme={theme}>
 		<ModalsProvider>
-			<QueryClientProvider client={queryClient}>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</QueryClientProvider>
+			<GoogleOAuthProvider clientId="375628380908-1p1h6mtffidanbrb2rksfs76jnglfodo.apps.googleusercontent.com">
+				<QueryClientProvider client={queryClient}>
+					<BrowserRouter>
+						<App />
+					</BrowserRouter>
+				</QueryClientProvider>
+			</GoogleOAuthProvider>
 		</ModalsProvider>
 	</MantineProvider>
 );
