@@ -17,6 +17,7 @@ import {
 	loginQuery,
 	registerQuery,
 	updateTagNoteQuery,
+	updateNoteQuery
 } from '../Utils/Queries';
 import { setInvalidError } from '../Utils/Utils';
 import { useAuth } from './useAuth';
@@ -173,6 +174,14 @@ export const useMutations = () => {
 		})
 	);
 
+	const [updateNoteMutation, setUpdateNoteMutation] = useState(
+		useMutation(updateNoteQuery, {
+			onError: (error) => {
+				setInvalidError(setInvalid, error);
+			},
+		})
+	);
+
 	return {
 		deleteProjectMutation,
 		loginMutation,
@@ -188,6 +197,7 @@ export const useMutations = () => {
 		deleteSubSectionMutation,
 		deleteTagMutation,
 		createCommentMutation,
+		updateNoteMutation,
 		invalid,
 		setInvalid
 	};

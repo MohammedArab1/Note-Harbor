@@ -23,8 +23,8 @@ export function TagMultiSelect({ value, setValue, tagData }) {
 
 	const handleValueRemove = (val) => setValue(value.filter((v) => v !== val));
 
-	const values = value.map((item) =>
-		tagData.map((tag) => {
+	const values = value.map((item) => {
+		return tagData.map((tag) => {
 			if (tag.value === item) {
 				return (
 					<TagOptionPill
@@ -38,6 +38,7 @@ export function TagMultiSelect({ value, setValue, tagData }) {
 				);
 			}
 		})
+	}
 	);
 	const dot = (color = 'transparent') => ({
 		'--dot-color': color,

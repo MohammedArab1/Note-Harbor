@@ -52,7 +52,7 @@ export const TagsDetailModal = ({ opened, close }) => {
 													tag.notes.some((n) => n._id === note._id)
 												);
 												return (
-													<React.Fragment key={note._id}>
+													<React.Fragment key={tag._id+"_"+note._id}>
 														<ol>
 															<li>
 																<ViewNoteDetailsDialog

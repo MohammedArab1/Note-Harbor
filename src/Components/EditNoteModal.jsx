@@ -19,10 +19,20 @@ import ErrorAlert from './ErrorAlert';
 import { GenericModal } from './GenericModal';
 import { TagMultiSelect } from './TagMultiSelect';
 
-export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
+export const EditNoteModal = ({
+	noteId,
+	projectId,
+	subSectionId,
+	opened,
+	close,
+	initialNoteContent,
+	initialSource,
+	initialAdditionalSourceInfo,
+	initialTags,
+}) => {
 	const { allProjectNotes, setAllProjectNotes, tags, setTags } =
 		React.useContext(AppDataContext);
-	const { createNoteMutation, updateTagNoteMutation, invalid } = useMutations();
+	const { updateNoteMutation, updateTagNoteMutation, invalid } = useMutations();
 	const {
 		register,
 		handleSubmit,
@@ -33,7 +43,11 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 		resolver: yupResolver(createNoteSchema),
 	});
 	const [uniqueSources, setUniqueSources] = React.useState([]);
-	const [selectedTags, setSelectedTags] = React.useState([]);
+	const [selectedTags, setSelectedTags] = React.useState(
+		initialTags.map((tag) => {
+			return tag._id;
+		})
+	);
 	const [addSource, setAddSource] = React.useState(false);
 	const [userSourceInput, setUserSourceInput] = React.useState('');
 	const [
@@ -44,10 +58,18 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 	const handleAddSource = () => {
 		setAddSource(!addSource);
 	};
-
 	React.useEffect(() => {
 		setUniqueSources(getUniqueSources(allProjectNotes));
 	}, [allProjectNotes]);
+	React.useEffect(() => {
+		setValue('content', initialNoteContent);
+		setValue('addSource', initialSource ? true : false);
+		setAddSource(initialSource ? true : false);
+		setValue('source', initialSource);
+		setUserSourceInput(initialSource);
+		setUserAdditionalSourceInformationInput(initialAdditionalSourceInfo);
+		setValue('additionalSourceInformation', initialAdditionalSourceInfo);
+	}, []);
 
 	React.useEffect(() => {
 		setSelectValues(
@@ -62,8 +84,9 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 	}, [tags]);
 	const handleCreateNote = async (data) => {
 		const { content } = data;
-		createNoteMutation.mutate(
+		updateNoteMutation.mutate(
 			{
+				noteId,
 				content,
 				projectId: projectId || null,
 				subSectionId: subSectionId || null,
@@ -80,7 +103,9 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 			},
 			{
 				onSuccess: (data) => {
-					setAllProjectNotes([...allProjectNotes, data]);
+					setAllProjectNotes((prevNotes) =>
+						prevNotes.map((note) => (note._id === data._id ? data : note))
+					);
 					if (selectedTags && selectedTags.length > 0) {
 						const newTags = tags.map((tag) => {
 							// Find the corresponding tag in the data array
@@ -111,13 +136,13 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 
 	return (
 		<div>
-			<GenericModal opened={opened} close={close} title="Create a note">
+			<GenericModal opened={opened} close={close} title="Edit a note">
 				<form
 					onSubmit={handleSubmit((data) => {
 						handleCreateNote(data);
 					})}
 				>
-					{createNoteMutation.isFetching && (
+					{updateNoteMutation.isFetching && (
 						<LoadingOverlay
 							visible={true}
 							zIndex={1000}
@@ -179,6 +204,7 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 									placeholder={'Your additional source information here'}
 									id="additionalSourceInformation"
 									label="Additional Source Information"
+									value={userAdditionalSourceInformationInput || ''}
 									onChange={(event) => {
 										setUserAdditionalSourceInformationInput(
 											event.currentTarget.value
@@ -201,7 +227,7 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 						/>
 					</Box>
 					<Button variant="text" type="submit">
-						Create Note
+						Edit Note
 					</Button>
 				</form>
 			</GenericModal>

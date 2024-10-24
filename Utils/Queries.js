@@ -1,8 +1,8 @@
-import axios from 'axios'
-import { returnSessionObject } from './Utils'
+import axios from 'axios';
 import { db } from '../offlineDB/db';
-import { useLiveQuery } from "dexie-react-hooks";
-import { isOfflineMode } from './Utils';
+import { isOfflineMode, returnSessionObject } from './Utils';
+import Dexie from 'dexie';
+
 
 var baseUrl = import.meta.env.VITE_REACT_APP_API_URL
 if (import.meta.env.PROD) {
@@ -173,13 +173,88 @@ export const createNoteQuery = async (noteObject) => {
       dateUpdated:Date.now(),
       sources:noteObject.sources,
     })
-    const newNote = await db.note.get(newNoteId)
+    let newNote = await db.note.get(newNoteId)
+
+    if (noteObject.tags && Array.isArray(noteObject.tags) && noteObject.tags.length > 0) {
+      await db.transaction('rw', db.tag, async () => {
+        // Fetch existing tags
+        const existingTags = await db.tag.bulkGet(noteObject.tags);
+    
+        // Create or update tags
+        await Promise.all(noteObject.tags.map(async (tag, index) => {
+            const existingTag = existingTags[index];
+            if (existingTag) {
+                await db.tag.update(tag, {
+                  notes: existingTag.notes ? [...existingTag.notes, newNoteId] : [newNoteId]
+                });
+            } else {
+                await db.tag.put({
+                    _id: tag,
+                    notes: [newNoteId]
+                });
+            }
+        }))
+      })
+      const updatedTags = await db.tag.bulkGet(noteObject.tags)
+      
+      newNote = {
+        ...newNote,
+        tags: updatedTags
+      }
+    }
     return newNote
+
   }
   return axios.post(`${baseUrl}/note`, noteObject)
   .then((res) => {
     return res.data
   })
+}
+
+export const updateNoteQuery = async (noteObject) => {
+
+  if (isOfflineMode()) {
+    await db.note.update(noteObject.noteId,{
+      content:noteObject.content,
+      dateUpdated:Date.now(),
+      sources:noteObject.sources,
+    })
+    let newNote = await db.note.get(noteObject.noteId)
+    //only for update
+    await db.tag.where('notes').equals(noteObject.noteId).modify(tag => {
+      tag.notes = tag.notes.filter(noteId => noteId !== noteObject.noteId);
+    });
+  
+    if (noteObject.tags && Array.isArray(noteObject.tags) && noteObject.tags.length > 0) {
+      await db.transaction('rw', db.tag, async () => {
+        // Fetch existing tags
+        const existingTags = await db.tag.bulkGet(noteObject.tags);
+    
+        // Create or update tags
+        await Promise.all(noteObject.tags.map(async (tag, index) => {
+            const existingTag = existingTags[index];
+            if (existingTag) {
+                await db.tag.update(tag, {
+                  notes: existingTag.notes ? [...existingTag.notes, noteObject.noteId] : [noteObject.noteId]
+                });
+            } else {
+                await db.tag.put({
+                    _id: tag,
+                    notes: [noteObject.noteId]
+                });
+            }
+        }))
+      })
+      const updatedTags = await db.tag.bulkGet(noteObject.tags)
+      
+      newNote = {
+        ...newNote,
+        tags: updatedTags
+      }
+    }
+    return newNote
+  }
+  return axios.patch(`${baseUrl}/note/${noteObject.noteId}`, {noteObject}).then(res => res.data)
 }
 
 export const createTagQuery = async (tagObject) => {

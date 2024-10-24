@@ -10,9 +10,11 @@ import {
 	Text,
 	Textarea,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { IconCircleFilled, IconEdit, IconTrash } from '@tabler/icons-react';
 import React, { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 import { AppDataContext } from '../../context/AppDataContext';
 import { useAuth } from '../../customHooks/useAuth';
 import { useMutations } from '../../customHooks/useMutations';
@@ -21,9 +23,13 @@ import {
 	handleDeleteOneNote,
 	handleNoteCommentSubmit,
 } from '../../Utils/Utils';
-import { createNoteCommentSchema } from '../../Utils/yupSchemas';
+import {
+	createNoteCommentSchema,
+	createNoteSchema,
+} from '../../Utils/yupSchemas';
 import Comment from './Comment';
 import ConfirmationPopup from './ConfirmationPopup';
+import { EditNoteModal } from './EditNoteModal';
 import { GenericModal } from './GenericModal';
 
 const ViewNoteDetailsDialog = ({
@@ -34,12 +40,15 @@ const ViewNoteDetailsDialog = ({
 	noteTags,
 }) => {
 	const { user } = useAuth();
+	const { projectId } = useParams();
+	const [editNoteClicked, editNoteHandler] = useDisclosure(false);
 	const { allProjectNotes, setAllProjectNotes } = useContext(AppDataContext);
 	const [open, setOpen] = useState(false);
 	const [comments, setComments] = useState([]);
 	const [isFetchingComments, setIsFetchingComments] = useState(false);
 	const { createCommentMutation, invalid, deleteNoteMutation } = useMutations();
 	const [commentTree, setCommentTree] = useState([]);
+
 	function createCommentTree(comments) {
 		let commentMap = {};
 		comments.forEach(
@@ -98,6 +107,18 @@ const ViewNoteDetailsDialog = ({
 	} = useForm({
 		resolver: yupResolver(createNoteCommentSchema),
 	});
+	const {
+		register: registerEdit,
+		handleSubmit: handleSubmitEdit,
+		formState: { errors: errorsEdit },
+		setValue: setValueEdit,
+	} = useForm({
+		resolver: yupResolver(createNoteSchema),
+	});
+
+	useEffect(() => {
+		setValueEdit('editNote', noteContent);
+	}, [noteContent, setValueEdit, editNoteClicked]);
 	return (
 		<div>
 			{actionComponentWithOnClick}
@@ -114,59 +135,80 @@ const ViewNoteDetailsDialog = ({
 							<Text truncate="end" size="sm" c="dimmed" mb={10}>
 								Note Content
 							</Text>
-							<ActionIcon variant="subtle" aria-label="edit note">
+							<ActionIcon
+								variant="subtle"
+								aria-label="edit note"
+								onClick={(e) => {
+									!editNoteClicked
+										? editNoteHandler.open()
+										: editNoteHandler.close();
+								}}
+							>
 								<IconEdit
 									style={{ width: '70%', height: '70%' }}
 									stroke={1.5}
 								/>
 							</ActionIcon>
 						</Flex>
+						<div>
+							<Flex gap="md" direction="row" wrap="wrap">
+								<Text
+									lineClamp={3}
+									fw={500}
+									styles={{ root: { wordBreak: 'break-word' } }}
+								>
+									{noteContent}
+								</Text>
+							</Flex>
+							<Divider my={'sm'} />
+							{noteSources.length > 0 && (
+								<>
+									<Grid>
+										<Grid.Col span={6}>
+											<Text truncate="end" size="sm" c="dimmed">
+												Source
+											</Text>
+										</Grid.Col>
+										<Grid.Col span={6}>
+											<Text size="sm" c="dimmed">
+												Additional Source Information
+											</Text>
+										</Grid.Col>
 
-						<Flex mt={'lg'} gap="md" direction="row" wrap="wrap">
-							<Text
-								lineClamp={3}
-								fw={500}
-								styles={{ root: { wordBreak: 'break-word' } }}
-							>
-								{noteContent}
-							</Text>
-						</Flex>
-						<Divider my={'sm'} />
-						{noteSources.length > 0 && (
-							<>
-								<Grid>
-									<Grid.Col span={6}>
-										<Text truncate="end" size="sm" c="dimmed">
-											Source
-										</Text>
-									</Grid.Col>
-									<Grid.Col span={6}>
-										<Text size="sm" c="dimmed">
-											Additional Source Information
-										</Text>
-									</Grid.Col>
-
-									{noteSources.map((source, i) => {
-										return (
-											<React.Fragment key={i}>
-												<Grid.Col span={6}>
-													<Text fw={500}>{source.source}</Text>
-												</Grid.Col>
-												<Grid.Col span={6}>
-													<Text
-														fw={500}
-														styles={{ root: { wordBreak: 'break-word' } }}
-													>
-														{source.additionalSourceInformation}
-													</Text>
-												</Grid.Col>
-											</React.Fragment>
-										);
-									})}
-								</Grid>
-								<Divider my={'sm'} />
-							</>
-						)}
+										{noteSources.map((source, i) => {
+											return (
+												<React.Fragment key={i}>
+													<Grid.Col span={6}>
+														<Text fw={500}>{source.source}</Text>
+													</Grid.Col>
+													<Grid.Col span={6}>
+														<Text
+															fw={500}
+															styles={{ root: { wordBreak: 'break-word' } }}
+														>
+															{source.additionalSourceInformation}
+														</Text>
+													</Grid.Col>
+												</React.Fragment>
+											);
+										})}
+									</Grid>
+									<Divider my={'sm'} />
+								</>
+							)}
+						</div>
+						<EditNoteModal
+							noteId={noteId}
+							projectId={projectId}
+							opened={editNoteClicked}
+							close={editNoteHandler.close}
+							initialNoteContent={noteContent}
+							initialSource={noteSources[0]?.source || ''}
+							initialAdditionalSourceInfo={
+								noteSources[0]?.additionalSourceInformation || ''
+							}
+							initialTags={noteTags}
+						></EditNoteModal>
 						{noteTags?.length > 0 && (
 							<>
 								<Text truncate="end" size="sm" c="dimmed" mb={10}>

@@ -31,7 +31,6 @@ export const CreateSubSectionModal = ({
 			{
 				onSuccess: (data) => {
 					setSubSections([...subSections, data]);
-					setOpen(false);
 					setValue('name', '');
 					setValue('description', '');
 				},
@@ -76,13 +75,11 @@ export const CreateSubSectionModal = ({
 						{...register('description')}
 						radius="md"
 					/>
-					{/* <Flex mt={15} gap="md" justify="center" direction="row" wrap="wrap"> */}
 					<Group justify="center" mt="xl">
 						<Button variant="text" type="submit">
 							Create sub section
 						</Button>
 					</Group>
-					{/* </Flex> */}
 				</form>
 			</GenericModal>
 		</div>
