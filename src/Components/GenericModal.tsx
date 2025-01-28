@@ -1,8 +1,12 @@
 import { Modal, ScrollArea } from '@mantine/core';
+import { ScrollAreaComponent } from '@mantine/core/lib/components/Drawer/Drawer.context';
+import { GenericModalProps } from '../../types';
 
-const CustomScrollArea = (props) => {
+const CustomScrollArea:ScrollAreaComponent = (props) => {
 	return <ScrollArea.Autosize type="always" scrollbars="y" {...props} />;
 };
+
+
 
 export const GenericModal = ({
 	opened,
@@ -11,7 +15,7 @@ export const GenericModal = ({
 	title,
 	children,
 	bgColor,
-}) => {
+}:GenericModalProps) => {
 	return (
 		<>
 			<Modal.Root

@@ -1,3 +1,5 @@
+import {ErrorPayload} from "../types"
+
 export const returnSessionObject = () => {
   return JSON.parse(localStorage.getItem('user'))
 }
@@ -6,8 +8,8 @@ export const isUserLeader = (userId) => {
   return returnSessionObject()?.id && returnSessionObject()?.id === userId;
 }
 
-export const setInvalidError = (setInvalid, error) => {
-  setInvalid({isInvalid:true,message:error?.response?.data?.error || "There was an error with your request. Please try again later."})
+export const setInvalidError = (setInvalid, error: ErrorPayload) => {
+  setInvalid({isInvalid:true,message:error.error || "There was an error with your request. Please try again later."})
   setTimeout(() => {
     setInvalid({isInvalid:false,message:""})
   }, 10000);

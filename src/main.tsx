@@ -50,16 +50,21 @@ const theme = createTheme({
 	},
 });
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-	<MantineProvider theme={theme}>
-		<ModalsProvider>
-			<GoogleOAuthProvider clientId="375628380908-1p1h6mtffidanbrb2rksfs76jnglfodo.apps.googleusercontent.com">
-				<QueryClientProvider client={queryClient}>
-					<BrowserRouter>
-						<App />
-					</BrowserRouter>
-				</QueryClientProvider>
-			</GoogleOAuthProvider>
-		</ModalsProvider>
-	</MantineProvider>
-);
+const rootElement = document.getElementById('root')
+
+if (rootElement instanceof HTMLElement) {
+	ReactDOM.createRoot(rootElement).render(
+		<MantineProvider theme={theme}>
+			<ModalsProvider>
+				<GoogleOAuthProvider clientId="375628380908-1p1h6mtffidanbrb2rksfs76jnglfodo.apps.googleusercontent.com">
+					<QueryClientProvider client={queryClient}>
+						<BrowserRouter>
+							<App />
+						</BrowserRouter>
+					</QueryClientProvider>
+				</GoogleOAuthProvider>
+			</ModalsProvider>
+		</MantineProvider>
+	);
+}
+

@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AppDataContext } from '../context/AppDataContext';
 import { AuthContext } from '../context/AuthContext';
-import Login from './Authentication/Login';
+// import Login from './Authentication/Login';
 import PrivateRoutes from './Authentication/PrivateRoutes';
 import PublicRoutes from './Authentication/PublicRoutes';
-import Register from './Authentication/Register';
+// import Register from './Authentication/Register';
 import FetchProjectDetails from './Components/FetchProjectDetails';
 import NavigationBar from './Components/NavigationBar';
 import Main from './Home';
@@ -46,10 +46,10 @@ const App = () => {
 								<NavigationBar />
 								<Routes location={location} key={location.key}>
 									<Route index path="/" element={<Main />} />
-									<Route element={<PublicRoutes />}>
+									{/* <Route element={<PublicRoutes />}>
 										<Route path="/login" element={<Login />} />
 										<Route path="/Register" element={<Register />} />
-									</Route>
+									</Route> */}
 
 									<Route element={<PrivateRoutes />}>
 										<Route path="/UserHome" element={<UserHomePage />} />

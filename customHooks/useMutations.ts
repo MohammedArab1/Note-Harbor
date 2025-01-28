@@ -21,10 +21,13 @@ import {
 } from '../Utils/Queries';
 import { setInvalidError } from '../Utils/Utils';
 import { useAuth } from './useAuth';
+import { LoginPayload, Result, ErrorPayload } from '../types';
+import { useLocalStorage } from './useLocalStorage';
 
 export const useMutations = () => {
 	const navigate = useNavigate();
 	const { user, login } = useAuth();
+	const { setItem } = useLocalStorage();
 
 	const { invalid, setInvalid } = useContext(AuthContext);
 
@@ -41,20 +44,18 @@ export const useMutations = () => {
 
 	const [loginMutation, setLoginMutation] = useState(
 		useMutation(loginQuery, {
-			onSuccess: (data) => {
-				const user = {
-					token: data.token,
-					id: data.user._id,
-					email: data.user.email,
-					firstName: data.user.firstName,
-					lastName: data.user.lastName,
-					provider: data.user.authProvider
-				};
-				login(user);
-				localStorage.setItem('offlineMode', false);
-				navigate('/UserHome');
+			onSuccess: (result) => {
+				console.log("onsuccess")
+					const user:LoginPayload  = {
+						token: result.token,
+						user:result.user
+					};
+					login(user);
+					setItem('offlineMode', false)
+					navigate('/UserHome');
 			},
-			onError: (error) => {
+			onError: (error:ErrorPayload) => {
+				console.log("in on error: ", error)
 				setInvalidError(setInvalid, error);
 			},
 		})
@@ -62,19 +63,16 @@ export const useMutations = () => {
 
 	const [registerMutation, setRegisterMutation] = useState(
 		useMutation(registerQuery, {
-			onSuccess: (data) => {
-				const user = {
-					token: data.token,
-					id: data.newUser._id,
-					email: data.newUser.email,
-					firstName: data.newUser.firstName,
-					lastName: data.newUser.lastName,
+			onSuccess: (result) => {
+				const user: LoginPayload = {
+					token: result.token,
+					user:result.user
 				};
 				login(user);
-				localStorage.setItem('offlineMode', false);
+				setItem('offlineMode', false)
 				navigate('/UserHome');
 			},
-			onError: (error) => {
+			onError: (error:ErrorPayload) => {
 				setInvalidError(setInvalid, error);
 			},
 		})

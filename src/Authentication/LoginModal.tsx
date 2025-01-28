@@ -12,12 +12,15 @@ import {
 import { GoogleLogin } from '@react-oauth/google';
 import { IconAt, IconInfoCircle, IconLock } from '@tabler/icons-react';
 import jwt_decode from 'jwt-decode';
-import { useForm } from 'react-hook-form';
+import { FieldValue, FieldValues, useForm } from 'react-hook-form';
 import { useMutations } from '../../customHooks/useMutations';
 import { setInvalidError } from '../../Utils/Utils';
 import { loginSchema } from '../../Utils/yupSchemas';
 import { GenericModal } from '../Components/GenericModal';
-export const LoginModal = ({ opened, close }) => {
+import { CustomModalProps, LoginRequest } from '../../types';
+import { ModalProps } from '@mui/material';
+
+export const LoginModal = ({ opened, close }:CustomModalProps) => {
 	const {
 		register,
 		handleSubmit,
@@ -31,12 +34,13 @@ export const LoginModal = ({ opened, close }) => {
 		<IconLock style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
 	);
 
-	const handleLogin = async (data) => {
-		const { email, password } = data;
-		loginMutation.mutate({ password, email });
+	const handleLogin = async (data: FieldValues) => {
+		const { email, password } = data as LoginRequest;
+		loginMutation.mutate({ email, password });
 	};
-	const handleGoogleLogin = async (data) => {
-		loginMutation.mutate(data);
+	const handleGoogleLogin = async (data: FieldValues) => {
+		const { email, password, authProvider } = data as LoginRequest;
+		loginMutation.mutate({email,password,authProvider});
 	};
 	return (
 		<>

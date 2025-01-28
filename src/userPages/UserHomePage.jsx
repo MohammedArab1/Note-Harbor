@@ -45,11 +45,10 @@ const UserHomePage = () => {
 		() => fetchProjectPerUserId(),
 		{
 			onSuccess: (data) => {
-				setProjects(data.project);
+				setProjects(data);
 			},
 		}
 	);
-
 	if (error) return <ErrorPage></ErrorPage>;
 	if (isFetching)
 		return (
@@ -76,7 +75,7 @@ const UserHomePage = () => {
 			>
 				<Title order={1}>Projects</Title>
 			</Flex>
-			{projects.length > 0 ? (
+			{projects?.length > 0 ? (
 				<>
 					<Grid>
 						{projects.map((project, i) => {

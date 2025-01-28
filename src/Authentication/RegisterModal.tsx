@@ -8,12 +8,14 @@ import {
 	rem,
 } from '@mantine/core';
 import { IconAt, IconInfoCircle, IconLock } from '@tabler/icons-react';
-import { useForm } from 'react-hook-form';
+import { FieldValues, useForm } from 'react-hook-form';
 import { useMutations } from '../../customHooks/useMutations';
 import { registerSchema } from '../../Utils/yupSchemas';
 import { GenericModal } from '../Components/GenericModal';
+import { ModalProps } from '@mui/material';
+import { CustomModalProps, RegisterRequest } from '../../types';
 
-export const RegisterModal = ({ opened, close }) => {
+export const RegisterModal = ({ opened, close }:CustomModalProps) => {
 	const atIcon = <IconAt style={{ width: rem(16), height: rem(16) }} />;
 	const lockIcon = (
 		<IconLock style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
@@ -26,14 +28,14 @@ export const RegisterModal = ({ opened, close }) => {
 	} = useForm({
 		resolver: yupResolver(registerSchema),
 	});
-	const handleRegister = async (data) => {
-		const { firstName, lastName, email, password } = data;
+	const handleRegister = async (data: FieldValues) => {
+		const { firstName, lastName, email, password } = data as RegisterRequest;
 		registerMutation.mutate({ firstName, lastName, email, password });
 	};
 
 	return (
 		<>
-			<GenericModal opened={opened} close={close} title="Sign up" centered>
+			<GenericModal opened={opened} close={close} title="Sign up">
 				<div>
 					<form
 						onSubmit={handleSubmit((data) => {
