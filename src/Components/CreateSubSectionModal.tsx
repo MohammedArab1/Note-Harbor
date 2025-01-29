@@ -6,6 +6,7 @@ import { createSubSectionSchema } from '../../Utils/yupSchemas';
 import { useMutations } from '../../customHooks/useMutations';
 import ErrorAlert from './ErrorAlert';
 import { GenericModal } from './GenericModal';
+import mongoose from 'mongoose';
 
 export const CreateSubSectionModal = ({
 	subSections,
@@ -27,7 +28,7 @@ export const CreateSubSectionModal = ({
 	const handleCreateSubSection = async (data) => {
 		var { name, description } = data;
 		createSubSectionMutation.mutate(
-			{ name, description, projectId },
+			{_id:-1, name, description, project:Number(projectId) },
 			{
 				onSuccess: (data) => {
 					setSubSections([...subSections, data]);

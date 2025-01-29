@@ -40,7 +40,7 @@ export interface IProject {
 
 export interface ISubSection {
 	_id: Types.ObjectId | number;
-	project: Types.ObjectId | IProject;
+	project: number | Types.ObjectId | IProject;
 	name: string;
 	description?: string;
 }

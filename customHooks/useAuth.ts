@@ -19,7 +19,7 @@ export const useAuth = () => {
 				logout();
 			}
 		} catch (error: any) {
-			console.log("Error fetching local storage item: ", error.message)
+			// console.log("Error fetching local storage item: ", error.message)
 		}
 		
 		setIsLoading(false);

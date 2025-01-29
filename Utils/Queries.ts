@@ -2,8 +2,9 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { db } from '../offlineDB/db';
 import { isOfflineMode, returnSessionObject } from './Utils';
 import Dexie from 'dexie';
-import {IProject, IUser, LoginPayload, LoginRequest, RegisterRequest, Result} from "../types" 
+import {IProject, ISubSection, IUser, LoginPayload, LoginRequest, RegisterRequest, Result} from "../types" 
 import { ErrorPayload } from 'vite';
+import mongoose, { ObjectId } from 'mongoose';
 
 
 var baseUrl = import.meta.env.VITE_REACT_APP_API_URL
@@ -11,16 +12,17 @@ if (import.meta.env.PROD) {
   baseUrl = "/api"
 }
 
-// Request interceptors for API calls. This will add the token to the header of every request
-axios.interceptors.request.use(
-  config => {
-    config.headers['Authorization'] = returnSessionObject() ? `Bearer ${returnSessionObject().token}` : null
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
+axios.interceptors.request.use(function (config) {
+  try {
+    const sessionObject = returnSessionObject()
+    config.headers['Authorization'] = `Bearer ${sessionObject.token}`
+    return config
+  } catch (error) {
+    return config
+  }
+}, function (error) {
+  return Promise.reject(error);
+});
 
 
 async function genericQuery<T>(f: () => Promise<AxiosResponse<any, any>>): Promise<T> {
@@ -69,120 +71,151 @@ export const fetchProjectPerUserId = async ():Promise<IProject[]>  => {
       return projects
     }   
   ) 
-  // if (isOfflineMode()) {
-  //   const projects = await db.project.toArray()
-  //   return projects
-  // }
-  // return genericQuery(()=>{
-  //   return axios.get(`${baseUrl}/project`)
-  // })
 }
-export const fetchProjectById = async (projectId: number):Promise<IProject> => {
+export const fetchProjectById = async (projectId: number | mongoose.Types.ObjectId):Promise<IProject> => {
+  console.log("calling fetch project by id, project id is: ", typeof projectId);
+  
   return genericQueryWithOffline(
     async()=>{
+      //todo
       return axios.get(`${baseUrl}/project/${projectId}`)
     },
     async()=>{
-      console.log("projectId is: ",projectId)
-      const project = await db.project.get(projectId)
+      const project = await db.project.get({_id:Number(projectId)})
       if (!project){
-        console.log("project does not exist?", project)
         throw new Error('Project does not exist!');
       }
       return project
     }   
   ) 
-  // if (isOfflineMode()) {
-  //   const project = await db.project.get({_id:projectId})
-  //   return (project) ? project : null 
-  //   // return project
-  // }
-  // return axios.get(`${baseUrl}/project/${projectId}`)
-  // .then(
-  //   res => res.data as IProject
-  // )
 }
 
 export const createProjectQuery = async (projectObject: IProject) => {
-  if (isOfflineMode()) {
-    const newProjectId = await db.project.add(projectObject)
-    const newProject = await db.project.get(newProjectId)
-    return newProject
-  }
-  return axios.post(`${baseUrl}/project`, projectObject)
-  .then(
-    res => res.data
-  )
+  return genericQueryWithOffline(
+    async()=>{
+      return axios.post(`${baseUrl}/project`, projectObject)
+    },
+    async()=>{
+      const newProjectId = await db.project.add(projectObject)
+      const newProject = await db.project.get(newProjectId)
+      if (!newProject){
+        throw new Error('Cannot create project');
+      }
+      return newProject
+    }   
+  ) 
+
 }
 
 export const joinProjectQuery = (projectObject: IProject) => {
-  return axios.put(`${baseUrl}/project`, projectObject)
-  .then(
-    res => res.data
-  )
+  return genericQuery(async()=>{
+    return axios.put(`${baseUrl}/project`, projectObject)
+  })
 }
 
 
-export const deleteProjectQuery = async(project: IProject) => {
-  const projectId = project._id.toString()
-  if (isOfflineMode()) {
-    return db.transaction('rw', [db.project, db.subSection, db.note, db.comment, db.tag], async () => {
-      // projectId = Number(projectId)
-      // First make sure that project exists
-      const project = await db.project.get({_id:Number(projectId)});
-      if (!project) {
-          throw new Error('Project does not exist!');
-      }
-      // Fetch all subsections to be deleted
-      const subsectionsToBeDeleted = await db.subSection.where('project').equals(projectId).toArray();
-      if (subsectionsToBeDeleted.length > 0) {
-        const subSectionIds = subsectionsToBeDeleted.map(subsection => subsection._id.toString());
-        // Delete the appropriate subsections
-        await db.subSection.where('_id').anyOf(subSectionIds).delete();
-      }
-      // Delete the appropriate tags
-      await db.tag.where('project').equals(projectId).delete();
-      // Get all notes associated with the project to be deleted
-      const notesToBeDeleted = await db.note.where('project').equals(projectId).toArray();
-      if (notesToBeDeleted.length > 0){
-        const noteIds = notesToBeDeleted.map(note => note._id.toString());
-        // Delete all comments that have these notes to be deleted
-        await db.comment.where('note').anyOf(noteIds).delete();
-      }
-      // Delete the appropriate Notes
-      await db.note.where('project').equals(projectId).delete();
-      // Finally delete the actual project
-      const deletedProject = await db.project.delete(project._id);
-      return deletedProject;
-    })
-  }
-  return axios.delete(`${baseUrl}/project/${projectId}`)
-  .then(
-    res => res.data
+export const deleteProjectQuery = async(projectIdToDelete: number) => {
+  const projectId = projectIdToDelete.toString()
+  return genericQueryWithOffline(
+    async()=>{
+      return axios.delete(`${baseUrl}/project/${projectId}`)
+    },
+    async()=>{
+      return db.transaction('rw', [db.project, db.subSection, db.note, db.comment, db.tag], async () => {
+        // First make sure that project exists
+        const project = await db.project.get({_id:Number(projectId)});
+        if (!project) {
+            throw new Error('Project does not exist!');
+        }
+        // Fetch all subsections to be deleted
+        const subsectionsToBeDeleted = await db.subSection.where('project').equals(projectId).toArray();
+        if (subsectionsToBeDeleted.length > 0) {
+          const subSectionIds = subsectionsToBeDeleted.map(subsection => subsection._id.toString());
+          // Delete the appropriate subsections
+          await db.subSection.where('_id').anyOf(subSectionIds).delete();
+        }
+        // Delete the appropriate tags
+        await db.tag.where('project').equals(projectId).delete();
+        // Get all notes associated with the project to be deleted
+        const notesToBeDeleted = await db.note.where('project').equals(projectId).toArray();
+        if (notesToBeDeleted.length > 0){
+          const noteIds = notesToBeDeleted.map(note => note._id.toString());
+          // Delete all comments that have these notes to be deleted
+          await db.comment.where('note').anyOf(noteIds).delete();
+        }
+        // Delete the appropriate Notes
+        await db.note.where('project').equals(projectId).delete();
+        // Finally delete the actual project
+        const deletedProject = await db.project.delete(project._id);
+        return deletedProject;
+      })
+    }
   )
 }
 
 export const leaveProjectQuery = (projectId:number,newProject:IProject) => {
-  return axios.put(`${baseUrl}/project/${projectId}`, newProject)
-  .then(
-    res => res.data
-  )
+  axios.put(`${baseUrl}/project/${projectId}`, newProject)
+  // return axios.put(`${baseUrl}/project/${projectId}`, newProject)
+  // .then(
+  //   res => res.data
+  // )
 }
 
-export const createSubSectionQuery = async (subSectionObject) => {
-  if (isOfflineMode()) {
-    const newSubSectionId = await db.subSection.add({
-      project:Number(subSectionObject.projectId),
-      name:subSectionObject.name,
-      description:subSectionObject.description
-    })
-    const newSubSection = await db.subSection.get(newSubSectionId)
-    return newSubSection
-  }
-  return axios.post(`${baseUrl}/subsection`, subSectionObject)
-  .then(
-    res => res.data
-  )
+function isProject(test: any): test is IProject{
+  return typeof test.accessCode === "string";
+}
+
+export const createSubSectionQuery = async (subSectionObject: ISubSection) => {
+  return genericQueryWithOffline(
+    async()=>{
+      return axios.post(`${baseUrl}/subsection`, subSectionObject)
+    },
+    async()=>{
+      console.log("subsection object in createsubsectionquery: ", subSectionObject);
+      if (typeof subSectionObject.project != "number") {
+        throw new Error('Cannot create subsection');
+      }
+      // var projectId = subSectionObject.project 
+      // console.log("project id in create subsection query is: ", projectId);
+      // if (isProject(subSectionObject.project)){
+      //   projectId = subSectionObject.project._id
+      // }
+      console.log("project id in create subsection query is: ", subSectionObject.project);
+      
+      const newSubSectionId = await db.subSection.add({
+        project:subSectionObject.project,
+        name:subSectionObject.name,
+        description:subSectionObject.description
+      })
+      const newSubSection = await db.subSection.get(newSubSectionId)
+      console.log("new subsection: ", newSubSection);
+      
+      if (!newSubSection){
+        throw new Error('Cannot create subsection');
+      }
+      return newSubSection
+      // const newProjectId = await db.project.add(projectObject)
+      // const newProject = await db.project.get(newProjectId)
+      // if (!newProject){
+      //   throw new Error('Cannot create project');
+      // }
+      // return newProject
+    }   
+  ) 
+  
+  // if (isOfflineMode()) {
+    // const newSubSectionId = await db.subSection.add({
+    //   project:Number(subSectionObject.projectId),
+    //   name:subSectionObject.name,
+    //   description:subSectionObject.description
+    // })
+    // const newSubSection = await db.subSection.get(newSubSectionId)
+    // return newSubSection
+  // }
+  // return axios.post(`${baseUrl}/subsection`, subSectionObject)
+  // .then(
+  //   res => res.data
+  // )
 }
 
 export const createNoteQuery = async (noteObject) => {
@@ -411,10 +444,16 @@ export const deleteTagQuery = async (tagId) => {
   )
 }
 
-export const fetchSubSectionsPerProjectId = async (projectId) => {
+export const fetchSubSectionsPerProjectId = async (projectId: number | ObjectId) => {
+  console.log("fetching subsections per project id");
+  
   if (isOfflineMode()) {
-    const subsections = await db.subSection.where("project").equals(Number(projectId)).toArray()
-    return subsections
+    // const subsections = await db.subSection.where("project").equals(objectIdProject).toArray()
+    if (typeof projectId === "number"){
+      const subsections = await db.subSection.where("project").equals(projectId).toArray()
+      return subsections
+    }
+
   }
   return axios.get(`${baseUrl}/subsection/${projectId}`)
   .then(

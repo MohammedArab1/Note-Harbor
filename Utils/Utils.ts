@@ -1,11 +1,24 @@
-import {ErrorPayload} from "../types"
+import {ErrorPayload, LoginPayload} from "../types"
 
-export const returnSessionObject = () => {
-  return JSON.parse(localStorage.getItem('user'))
+export const returnSessionObject = ():LoginPayload => {
+  const localStorageItem = localStorage.getItem('user')
+  
+  if (!localStorageItem) {
+    throw new Error("cannot fetch session object")
+  }
+  const parsedItem: LoginPayload = JSON.parse(localStorageItem) 
+  return parsedItem
 }
 
-export const isUserLeader = (userId) => {
-  return returnSessionObject()?.id && returnSessionObject()?.id === userId;
+export const isUserLeader = (userId: number) => {
+  try {
+    const sessionObject = returnSessionObject() 
+    console.log("sessionObject is: ", sessionObject)
+    return sessionObject.user._id === userId
+  } catch (error) {
+    console.error("cant fetch user leader: ", error)
+    return false
+  }
 }
 
 export const setInvalidError = (setInvalid, error: ErrorPayload) => {

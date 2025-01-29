@@ -202,7 +202,7 @@ const ProjectDetails = () => {
 						direction="row"
 						wrap="wrap"
 					>
-						{(isUserLeader(project?.leader?._id) || isOfflineMode()) && (
+						{(isOfflineMode() || (isUserLeader(project?.leader?._id))) && (
 							<ConfirmationPopup
 								actionComponent={<Button>Delete Project</Button>}
 								title="Delete project"

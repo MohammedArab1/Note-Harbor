@@ -3,12 +3,15 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { AppDataContext } from '../../context/AppDataContext';
 import { useAuth } from '../../customHooks/useAuth';
+import { setInvalidError } from '../../Utils/Utils';
 import {
 	fetchAllNotesForProject,
 	fetchProjectById,
 	fetchSubSectionsPerProjectId,
 	fetchTagsPerProjectId,
 } from '../../Utils/Queries';
+import { useMutations } from '../../customHooks/useMutations';
+import mongoose, { ObjectId, Schema } from 'mongoose';
 
 const FetchProjectDetails = () => {
 	const {
@@ -21,6 +24,7 @@ const FetchProjectDetails = () => {
 		allProjectNotes,
 		setAllProjectNotes,
 	} = useContext(AppDataContext);
+	const { setInvalid } = useMutations();
 	const { projectId } = useParams();
 	const { user } = useAuth();
 	const navigate = useNavigate();
@@ -28,8 +32,9 @@ const FetchProjectDetails = () => {
 	const [projectFetched, setProjectFetched] = useState(false);
 	const initialRenderForSubSectionUseEffect = useRef(true);
 	const initialRenderForAllProjectNotesUseEffect = useRef(true);
-
-	const fetchProjectAndSubSections = async (projectId) => {
+	console.log("in fetch project details?")
+	const fetchProjectAndSubSections = async (projectId: number | mongoose.Types.ObjectId ) => {
+		
 		const [project, subsections] = await Promise.all([
 			fetchProjectById(projectId),
 			fetchSubSectionsPerProjectId(projectId),
@@ -37,21 +42,32 @@ const FetchProjectDetails = () => {
 		return { project, subsections };
 	};
 	useEffect(() => {
+		console.log("in use effect, projectId is: ", projectId)
 		setqueriesFinished(false);
-		const fetchProjectAndSubSectionsInUseEffect = async (projectId) => {
+		const fetchProjectAndSubSectionsInUseEffect = async (projectId: number | mongoose.Types.ObjectId) => {
+			console.log("in fetchproejctandsubsections..., project id is: ", projectId);
+			
 			const data = await fetchProjectAndSubSections(projectId);
 			return data;
 		};
 		//todo add error handling here
-		if (projectId === undefined || projectId === null)
+		var newProjectId: number|mongoose.Types.ObjectId
+		if (!projectId)
 			return navigate('/UserHome');
-		fetchProjectAndSubSectionsInUseEffect(projectId)
+		else {
+			if (!Number(projectId)) {
+				newProjectId = Number(projectId)
+			}else {
+				newProjectId  = new mongoose.Types.ObjectId(projectId)
+			}
+		} 
+		fetchProjectAndSubSectionsInUseEffect(newProjectId)
 			.then((data) => {
-				if (!data.project.project) return navigate('/UserHome');
-				setProject(data.project.project);
+				setProject(data.project);
 				setSubSections(data.subsections);
 			})
 			.catch((error) => {
+				setInvalidError(setInvalid, {error:'Error fetching project details'});
 				return navigate('/UserHome');
 			});
 	}, [projectId]);

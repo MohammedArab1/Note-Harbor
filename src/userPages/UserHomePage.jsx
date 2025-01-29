@@ -12,6 +12,8 @@ import {
 	LoadingOverlay,
 	Text,
 	Title,
+	Transition,
+	Alert
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { motion } from 'framer-motion';
@@ -23,7 +25,8 @@ import { useAuth } from '../../customHooks/useAuth';
 import { CreateProjectModal } from '../Components/CreateProjectModal';
 import { ErrorPage } from './ErrorPage';
 import { ProjectCard } from '../Components/ProjectCard';
-
+import { useMutations } from '../../customHooks/useMutations';
+import { IconInfoCircle } from '@tabler/icons-react';
 
 const UserHomePage = () => {
 	const breadcrumbs = [{ title: 'Home', href: '/UserHome' }].map(
@@ -35,6 +38,7 @@ const UserHomePage = () => {
 	);
 
 	const { user } = useAuth(); //do not remove
+	const {invalid} = useMutations();
 	const [createProjectModalOpened, createProjectModalHandler] =
 		useDisclosure(false);
 
@@ -65,6 +69,32 @@ const UserHomePage = () => {
 			exit={{ opacity: 0 }}
 		>
 			<Breadcrumbs>{breadcrumbs}</Breadcrumbs>
+			<Flex
+				mt={5}
+				align="flex-start"
+				direction="row"
+				wrap="wrap"
+			>
+				<Transition
+					mounted={invalid.isInvalid}
+					transition="fade"
+					duration={400}
+					timingFunction="ease"
+				>
+					{(styles) => (
+						<div style={styles}>
+							<Alert
+								variant="light"
+								color="red"
+								title="Problem loading project details"
+								icon={<IconInfoCircle />}
+							>
+								{invalid.message}
+							</Alert>
+						</div>
+					)}
+				</Transition>
+			</Flex>
 			<Flex
 				mt={50}
 				mih={50}
