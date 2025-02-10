@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { db } from '../offlineDB/db';
 import { isOfflineMode, returnSessionObject } from './Utils';
 import Dexie from 'dexie';
-import {IProject, ISubSection, IUser, LoginPayload, LoginRequest, RegisterRequest, Result} from "../types" 
+import {INote, IProject, ISubSection, IUser, LoginPayload, LoginRequest, RegisterRequest, Result} from "../types" 
 import { ErrorPayload } from 'vite';
 import mongoose, { ObjectId } from 'mongoose';
 import { v4 } from 'uuid';
@@ -49,18 +49,19 @@ async function genericQueryWithOffline<T>(f: () => Promise<AxiosResponse<any, an
   }
 }
 
+//DONE
 export const loginQuery = async (credentialObject:LoginRequest):Promise<LoginPayload> =>{
   return genericQuery(async ()=>{
     return await axios.post(`${baseUrl}/login`, credentialObject);
   })
 }
-
+//DONE
 export const registerQuery = async (userObject:RegisterRequest):Promise<LoginPayload> => {
   return genericQuery(async()=>{
     return axios.post(`${baseUrl}/user/register`, userObject)
   })
 }
-
+//DONE
 export const fetchProjectPerUserId = async ():Promise<IProject[]>  => {
   return genericQueryWithOffline(
     async()=>{
@@ -72,6 +73,7 @@ export const fetchProjectPerUserId = async ():Promise<IProject[]>  => {
     }   
   ) 
 }
+//DONE
 export const fetchProjectById = async (projectId: string):Promise<IProject> => {
   
   return genericQueryWithOffline(
@@ -80,7 +82,6 @@ export const fetchProjectById = async (projectId: string):Promise<IProject> => {
     },
     async()=>{
       const project = await db.project.get({_id:projectId})
-      console.log("project returned from fetchrpojectbyid is: ", project)
       if (!project){
         throw new Error('Project does not exist!');
       }
@@ -88,7 +89,7 @@ export const fetchProjectById = async (projectId: string):Promise<IProject> => {
     }   
   ) 
 }
-
+//DONE
 export const createProjectQuery = async (projectObject: IProject) => {
   return genericQueryWithOffline(
     async()=>{
@@ -113,7 +114,7 @@ export const joinProjectQuery = (projectObject: IProject) => {
   })
 }
 
-
+//DONE FOR ONLINE
 export const deleteProjectQuery = async(projectIdToDelete: number) => {
   const projectId = projectIdToDelete.toString()
   return genericQueryWithOffline(
@@ -130,7 +131,7 @@ export const deleteProjectQuery = async(projectIdToDelete: number) => {
         // Fetch all subsections to be deleted
         const subsectionsToBeDeleted = await db.subSection.where('project').equals(projectId).toArray();
         if (subsectionsToBeDeleted.length > 0) {
-          const subSectionIds = subsectionsToBeDeleted.map(subsection => subsection._id.toString());
+          const subSectionIds = subsectionsToBeDeleted.map(subsection => subsection._id || "");
           // Delete the appropriate subsections
           await db.subSection.where('_id').anyOf(subSectionIds).delete();
         }
@@ -139,7 +140,7 @@ export const deleteProjectQuery = async(projectIdToDelete: number) => {
         // Get all notes associated with the project to be deleted
         const notesToBeDeleted = await db.note.where('project').equals(projectId).toArray();
         if (notesToBeDeleted.length > 0){
-          const noteIds = notesToBeDeleted.map(note => note._id.toString());
+          const noteIds = notesToBeDeleted.map(note => note._id || "");
           // Delete all comments that have these notes to be deleted
           await db.comment.where('note').anyOf(noteIds).delete();
         }
@@ -155,34 +156,18 @@ export const deleteProjectQuery = async(projectIdToDelete: number) => {
 
 export const leaveProjectQuery = (projectId:number,newProject:IProject) => {
   axios.put(`${baseUrl}/project/${projectId}`, newProject)
-  // return axios.put(`${baseUrl}/project/${projectId}`, newProject)
-  // .then(
-  //   res => res.data
-  // )
 }
 
-function isProject(test: any): test is IProject{
-  return typeof test.accessCode === "string";
-}
-
-export const createSubSectionQuery = async (subSectionObject: ISubSection) => {
+//DONE FOR ONLINE
+export const createSubSectionQuery = async (subSectionObject: ISubSection) => {  
   return genericQueryWithOffline(
     async()=>{
       return axios.post(`${baseUrl}/subsection`, subSectionObject)
     },
     async()=>{
-      console.log("subsection object in createsubsectionquery: ", subSectionObject);
-      if (typeof subSectionObject.project != "number") {
-        throw new Error('Cannot create subsection');
-      }
-      // var projectId = subSectionObject.project 
-      // console.log("project id in create subsection query is: ", projectId);
-      // if (isProject(subSectionObject.project)){
-      //   projectId = subSectionObject.project._id
-      // }
-      console.log("project id in create subsection query is: ", subSectionObject.project);
-      
+      const _id = v4()
       const newSubSectionId = await db.subSection.add({
+        _id,
         project:subSectionObject.project,
         name:subSectionObject.name,
         description:subSectionObject.description
@@ -194,76 +179,104 @@ export const createSubSectionQuery = async (subSectionObject: ISubSection) => {
         throw new Error('Cannot create subsection');
       }
       return newSubSection
-      // const newProjectId = await db.project.add(projectObject)
-      // const newProject = await db.project.get(newProjectId)
-      // if (!newProject){
-      //   throw new Error('Cannot create project');
-      // }
-      // return newProject
     }   
   ) 
   
-  // if (isOfflineMode()) {
-    // const newSubSectionId = await db.subSection.add({
-    //   project:Number(subSectionObject.projectId),
-    //   name:subSectionObject.name,
-    //   description:subSectionObject.description
-    // })
-    // const newSubSection = await db.subSection.get(newSubSectionId)
-    // return newSubSection
-  // }
-  // return axios.post(`${baseUrl}/subsection`, subSectionObject)
-  // .then(
-  //   res => res.data
-  // )
 }
 
-export const createNoteQuery = async (noteObject) => {
-  if (isOfflineMode()) {
-    const newNoteId = await db.note.add({
-      project:Number(noteObject.projectId) || null,
-      subSection:Number(noteObject.subSectionId) || null,
-      content:noteObject.content,
-      dateCreated:Date.now(),
-      dateUpdated:Date.now(),
-      sources:noteObject.sources,
-    })
-    let newNote = await db.note.get(newNoteId)
+export const createNoteQuery = async (noteObject: INote) => {
+  // if (isOfflineMode()) {
+  //   const newNoteId = await db.note.add({
+  //     project:Number(noteObject.projectId) || null,
+  //     subSection:Number(noteObject.subSectionId) || null,
+  //     content:noteObject.content,
+  //     dateCreated:Date.now(),
+  //     dateUpdated:Date.now(),
+  //     sources:noteObject.sources,
+  //   })
+  //   let newNote = await db.note.get(newNoteId)
 
-    if (noteObject.tags && Array.isArray(noteObject.tags) && noteObject.tags.length > 0) {
-      await db.transaction('rw', db.tag, async () => {
-        // Fetch existing tags
-        const existingTags = await db.tag.bulkGet(noteObject.tags);
+  //   if (noteObject.tags && Array.isArray(noteObject.tags) && noteObject.tags.length > 0) {
+  //     await db.transaction('rw', db.tag, async () => {
+  //       // Fetch existing tags
+  //       const existingTags = await db.tag.bulkGet(noteObject.tags);
     
-        // Create or update tags
-        await Promise.all(noteObject.tags.map(async (tag, index) => {
-            const existingTag = existingTags[index];
-            if (existingTag) {
-                await db.tag.update(tag, {
-                  notes: existingTag.notes ? [...existingTag.notes, newNoteId] : [newNoteId]
-                });
-            } else {
-                await db.tag.put({
-                    _id: tag,
-                    notes: [newNoteId]
-                });
-            }
-        }))
-      })
-      const updatedTags = await db.tag.bulkGet(noteObject.tags)
+  //       // Create or update tags
+  //       await Promise.all(noteObject.tags.map(async (tag, index) => {
+  //           const existingTag = existingTags[index];
+  //           if (existingTag) {
+  //               await db.tag.update(tag, {
+  //                 notes: existingTag.notes ? [...existingTag.notes, newNoteId] : [newNoteId]
+  //               });
+  //           } else {
+  //               await db.tag.put({
+  //                   _id: tag,
+  //                   notes: [newNoteId]
+  //               });
+  //           }
+  //       }))
+  //     })
+  //     const updatedTags = await db.tag.bulkGet(noteObject.tags)
       
-      newNote = {
-        ...newNote,
-        tags: updatedTags
-      }
-    }
-    return newNote
+  //     newNote = {
+  //       ...newNote,
+  //       tags: updatedTags
+  //     }
+  //   }
+  //   return newNote
 
-  }
-  return axios.post(`${baseUrl}/note`, noteObject)
-  .then((res) => {
-    return res.data
-  })
+  // }
+  // return axios.post(`${baseUrl}/note`, noteObject)
+  // .then((res) => {
+  //   return res.data
+  // })
+
+  return genericQueryWithOffline(
+    async()=>{
+      return axios.post(`${baseUrl}/note`, noteObject)
+    },
+    async()=>{
+        const _id = v4()
+        const newNoteId = await db.note.add({
+          _id,
+          project:noteObject.project,
+          subSection:noteObject.subSection,
+          content:noteObject.content,
+          dateCreated:new Date(Date.now()),
+          dateUpdated:new Date(Date.now()),
+          sources:noteObject.sources,
+        })
+        let newNote = await db.note.get(newNoteId)
+        //stopped here
+        if (noteObject.tags && Array.isArray(noteObject.tags) && noteObject.tags.length > 0) {
+          await db.transaction('rw', db.tag, async () => {
+            // Fetch existing tags
+            const existingTags = await db.tag.bulkGet(noteObject.tags);
+        
+            // Create or update tags
+            await Promise.all(noteObject.tags.map(async (tag, index) => {
+                const existingTag = existingTags[index];
+                if (existingTag) {
+                    await db.tag.update(tag, {
+                      notes: existingTag.notes ? [...existingTag.notes, newNoteId] : [newNoteId]
+                    });
+                } else {
+                    await db.tag.put({
+                        _id: tag,
+                        notes: [newNoteId]
+                    });
+                }
+            }))
+          })
+          const updatedTags = await db.tag.bulkGet(noteObject.tags)
+          
+          newNote = {
+            ...newNote,
+            tags: updatedTags
+          }
+        }
+        return newNote
+    })
 }
 
 export const updateNoteQuery = async (noteObject) => {

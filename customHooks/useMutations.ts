@@ -45,7 +45,6 @@ export const useMutations = () => {
 	const [loginMutation, setLoginMutation] = useState(
 		useMutation(loginQuery, {
 			onSuccess: (result) => {
-				console.log("onsuccess")
 					const user:LoginPayload  = {
 						token: result.token,
 						user:result.user
@@ -111,7 +110,7 @@ export const useMutations = () => {
 
 	const [createSubSectionMutation, setCreateSubSectionMutation] = useState(
 		useMutation(createSubSectionQuery, {
-			onError: (error) => {
+			onError: (error:ErrorPayload) => {
 				setInvalidError(setInvalid, error);
 			},
 		})

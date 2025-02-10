@@ -7,6 +7,13 @@ import { useMutations } from '../../customHooks/useMutations';
 import ErrorAlert from './ErrorAlert';
 import { GenericModal } from './GenericModal';
 import mongoose from 'mongoose';
+import { LoadingOverlay } from '@mantine/core';
+import { ISubSection } from '../../types';
+
+type SubsectionFormData = {
+	description?: string,
+	name: string
+}
 
 export const CreateSubSectionModal = ({
 	subSections,
@@ -14,6 +21,12 @@ export const CreateSubSectionModal = ({
 	projectId,
 	opened,
 	close,
+}:{
+	subSections: ISubSection[],
+	setSubSections: (ss:ISubSection[]) => void,
+	projectId: string
+	opened: boolean,
+	close: ()=>void
 }) => {
 	const { createSubSectionMutation, invalid } = useMutations();
 	const {
@@ -25,10 +38,10 @@ export const CreateSubSectionModal = ({
 		resolver: yupResolver(createSubSectionSchema),
 	});
 
-	const handleCreateSubSection = async (data) => {
+	const handleCreateSubSection = async (data: SubsectionFormData) => {
 		var { name, description } = data;
 		createSubSectionMutation.mutate(
-			{_id:-1, name, description, project:Number(projectId) },
+			{name, description, project:projectId },
 			{
 				onSuccess: (data) => {
 					setSubSections([...subSections, data]);
@@ -42,7 +55,7 @@ export const CreateSubSectionModal = ({
 		<div>
 			<GenericModal opened={opened} close={close} title="Create a subsection">
 				<form
-					onSubmit={handleSubmit((data) => {
+					onSubmit={handleSubmit((data: SubsectionFormData) => {
 						handleCreateSubSection(data);
 					})}
 				>

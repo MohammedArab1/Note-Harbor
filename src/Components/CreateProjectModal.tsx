@@ -14,12 +14,18 @@ import { useAuth } from '../../customHooks/useAuth';
 import { useMutations } from '../../customHooks/useMutations';
 import ErrorAlert from './ErrorAlert';
 import { GenericModal } from './GenericModal';
+import { IProject } from '../../types';
 
 export const CreateProjectModal = ({
 	projects,
 	setProjects,
 	opened,
 	close,
+}:{
+	projects: IProject[],
+	setProjects: (p:IProject[]) => void,
+	opened: boolean,
+	close: ()=>void
 }) => {
 	const { user } = useAuth();
 	const { createProjectMutation, invalid } = useMutations();
@@ -32,10 +38,16 @@ export const CreateProjectModal = ({
 		resolver: yupResolver(createProjectSchema),
 	});
 
-	const handleCreateProject = async (data) => {
+	type ProjectFormData = {
+		description?: string,
+		isPrivate: boolean,
+		projectName: string
+	}
+
+	const handleCreateProject = async (data: ProjectFormData) => {
 		const { projectName, description, isPrivate } = data;
 		createProjectMutation.mutate(
-			{ projectName, description, isPrivate },
+			{ projectName, description, private:isPrivate },
 			{
 				onSuccess: (data) => {
 					setProjects([...projects, data]);
@@ -50,7 +62,7 @@ export const CreateProjectModal = ({
 		<div>
 			<GenericModal opened={opened} close={close} title="Create Project">
 				<form
-					onSubmit={handleSubmit((data) => {
+					onSubmit={handleSubmit((data: ProjectFormData) => {
 						handleCreateProject(data);
 					})}
 				>

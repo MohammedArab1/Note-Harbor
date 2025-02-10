@@ -1,16 +1,16 @@
 import { Types } from 'mongoose';
 
 export interface ISource {
-	_id: string;
+	_id?: string;
 	source: string;
 	additionalSourceInformation: string;
 }
 
 export interface INote {
-	_id: string;
-	project?: Types.ObjectId | IProject;
-	subSection?: Types.ObjectId | ISubSection;
-	user: Types.ObjectId | IUser;
+	_id?: string;
+	project?: string | IProject;
+	subSection?: string | ISubSection;
+	user?: string | IUser;
 	content: string;
 	dateCreated: Date;
 	dateUpdated?: Date;
@@ -18,49 +18,49 @@ export interface INote {
 }
 
 export interface IComment {
-	_id: string;
-	user: Types.ObjectId | IUser;
+	_id?: string;
+	user: string | IUser;
 	content: string;
-	inReplyTo: Types.ObjectId | IComment;
+	inReplyTo: string | IComment;
 	dateCreated: Date;
 	dateUpdated?: Date;
-	note: Types.ObjectId | INote;
+	note: string | INote;
 }
 
 export interface IProject {
-	_id: string;
-	members?: Types.ObjectId[] | IUser[];
-	creationDate: Date;
-	accessCode: string;
-	leader: Types.ObjectId | IUser;
+	_id?: string;
+	members?: string[] | IUser[];
+	creationDate?: Date;
+	accessCode?: string;
+	leader?: string | IUser;
 	projectName: string;
 	description?: string;
 	private: boolean;
 }
 
 export interface ISubSection {
-	_id: string;
-	project: number | Types.ObjectId | IProject;
+	_id?: string;
+	project: string | IProject;
 	name: string;
 	description?: string;
 }
 
 export interface ITag {
-	_id: string;
-	project: Types.ObjectId | IProject;
+	_id?: string;
+	project: string | IProject;
 	tagName: string;
 	notes?: Types.ObjectId[] | INote[];
 	colour: string;
 }
 
 export interface IUser {
-	_id: string;
+	_id?: string;
 	firstName: string;
 	lastName: string;
 	password?: string;
 	authProvider?: string;
 	email: string;
-	projects: Types.ObjectId[] | IProject[];
+	projects: string[] | IProject[];
 }
 
 type JwtPayload = {

@@ -19,7 +19,8 @@ export const registerSchema = Yup.object().shape({
 
 export const createProjectSchema = Yup.object().shape({
   projectName: Yup.string().required("Project name is required"),
-  description: Yup.string()
+  description: Yup.string(),
+  isPrivate: Yup.boolean().required("Please choose whether this project is private or not")
 });
 
 export const JoinProjectSchema = Yup.object().shape({
