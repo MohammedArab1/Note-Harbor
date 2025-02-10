@@ -5,6 +5,7 @@ import Dexie from 'dexie';
 import {IProject, ISubSection, IUser, LoginPayload, LoginRequest, RegisterRequest, Result} from "../types" 
 import { ErrorPayload } from 'vite';
 import mongoose, { ObjectId } from 'mongoose';
+import { v4 } from 'uuid';
 
 
 var baseUrl = import.meta.env.VITE_REACT_APP_API_URL
@@ -67,21 +68,19 @@ export const fetchProjectPerUserId = async ():Promise<IProject[]>  => {
     },
     async()=>{
       const projects = await db.project.toArray()
-      console.log("all projects is: ", projects)
       return projects
     }   
   ) 
 }
-export const fetchProjectById = async (projectId: number | mongoose.Types.ObjectId):Promise<IProject> => {
-  console.log("calling fetch project by id, project id is: ", typeof projectId);
+export const fetchProjectById = async (projectId: string):Promise<IProject> => {
   
   return genericQueryWithOffline(
     async()=>{
-      //todo
       return axios.get(`${baseUrl}/project/${projectId}`)
     },
     async()=>{
-      const project = await db.project.get({_id:Number(projectId)})
+      const project = await db.project.get({_id:projectId})
+      console.log("project returned from fetchrpojectbyid is: ", project)
       if (!project){
         throw new Error('Project does not exist!');
       }
@@ -96,6 +95,7 @@ export const createProjectQuery = async (projectObject: IProject) => {
       return axios.post(`${baseUrl}/project`, projectObject)
     },
     async()=>{
+      projectObject._id = v4()
       const newProjectId = await db.project.add(projectObject)
       const newProject = await db.project.get(newProjectId)
       if (!newProject){

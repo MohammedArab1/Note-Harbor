@@ -27,6 +27,7 @@ import { ErrorPage } from './ErrorPage';
 import { ProjectCard } from '../Components/ProjectCard';
 import { useMutations } from '../../customHooks/useMutations';
 import { IconInfoCircle } from '@tabler/icons-react';
+import { IProject } from "../../types"
 
 const UserHomePage = () => {
 	const breadcrumbs = [{ title: 'Home', href: '/UserHome' }].map(
@@ -43,7 +44,7 @@ const UserHomePage = () => {
 		useDisclosure(false);
 
 	const navigate = useNavigate();
-	const [projects, setProjects] = useState([]);
+	const [projects, setProjects] = useState<IProject[]>([]);
 	const { isLoading, error, data, isFetching } = useQuery(
 		'projects',
 		() => fetchProjectPerUserId(),

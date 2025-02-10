@@ -32,8 +32,7 @@ const FetchProjectDetails = () => {
 	const [projectFetched, setProjectFetched] = useState(false);
 	const initialRenderForSubSectionUseEffect = useRef(true);
 	const initialRenderForAllProjectNotesUseEffect = useRef(true);
-	console.log("in fetch project details?")
-	const fetchProjectAndSubSections = async (projectId: number | mongoose.Types.ObjectId ) => {
+	const fetchProjectAndSubSections = async (projectId: string ) => {
 		
 		const [project, subsections] = await Promise.all([
 			fetchProjectById(projectId),
@@ -42,26 +41,16 @@ const FetchProjectDetails = () => {
 		return { project, subsections };
 	};
 	useEffect(() => {
-		console.log("in use effect, projectId is: ", projectId)
 		setqueriesFinished(false);
-		const fetchProjectAndSubSectionsInUseEffect = async (projectId: number | mongoose.Types.ObjectId) => {
-			console.log("in fetchproejctandsubsections..., project id is: ", projectId);
+		const fetchProjectAndSubSectionsInUseEffect = async (projectId: string) => {
 			
 			const data = await fetchProjectAndSubSections(projectId);
 			return data;
 		};
 		//todo add error handling here
-		var newProjectId: number|mongoose.Types.ObjectId
 		if (!projectId)
 			return navigate('/UserHome');
-		else {
-			if (!Number(projectId)) {
-				newProjectId = Number(projectId)
-			}else {
-				newProjectId  = new mongoose.Types.ObjectId(projectId)
-			}
-		} 
-		fetchProjectAndSubSectionsInUseEffect(newProjectId)
+		fetchProjectAndSubSectionsInUseEffect(projectId)
 			.then((data) => {
 				setProject(data.project);
 				setSubSections(data.subsections);

@@ -37,6 +37,7 @@
     "react-query": "^3.39.3",
     "react-router-dom": "^6.9.0",
     "react-select": "^5.8.0",
+    "uuid": "^11.0.5",
     "yup": "^1.0.2"
   },
   "devDependencies": {
