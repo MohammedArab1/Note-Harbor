@@ -8,31 +8,31 @@ export interface ISource {
 
 export interface INote {
 	_id?: string;
-	project?: string | IProject;
-	subSection?: string | ISubSection;
-	user?: string | IUser;
+	project?: string;
+	subSection?: string;
+	user?: string;
 	content: string;
 	dateCreated: Date;
 	dateUpdated?: Date;
-	sources?: ISource[];
+	sources?: string[];
 }
 
 export interface IComment {
 	_id?: string;
-	user: string | IUser;
+	user: string;
 	content: string;
-	inReplyTo: string | IComment;
+	inReplyTo: string;
 	dateCreated: Date;
 	dateUpdated?: Date;
-	note: string | INote;
+	note: string;
 }
 
 export interface IProject {
 	_id?: string;
-	members?: string[] | IUser[];
+	members?: string[];
 	creationDate?: Date;
 	accessCode?: string;
-	leader?: string | IUser;
+	leader?: string;
 	projectName: string;
 	description?: string;
 	private: boolean;
@@ -40,17 +40,17 @@ export interface IProject {
 
 export interface ISubSection {
 	_id?: string;
-	project: string | IProject;
+	project: string;
 	name: string;
 	description?: string;
 }
 
 export interface ITag {
 	_id?: string;
-	project: string | IProject;
-	tagName: string;
-	notes?: Types.ObjectId[] | INote[];
-	colour: string;
+	project?: string;
+	tagName?: string;
+	notes?: string[];
+	colour?: string;
 }
 
 export interface IUser {
@@ -60,7 +60,7 @@ export interface IUser {
 	password?: string;
 	authProvider?: string;
 	email: string;
-	projects: string[] | IProject[];
+	projects: string[];
 }
 
 type JwtPayload = {
@@ -88,7 +88,7 @@ export type LoginPayload = {
 };
 
 export type NoteWithTags = INote & {
-	tags?: ITag[];
+	tags?: string[];
 };
 
 export type RegisterRequest =  {

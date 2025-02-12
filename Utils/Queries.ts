@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { db } from '../offlineDB/db';
 import { isOfflineMode, returnSessionObject } from './Utils';
 import Dexie from 'dexie';
-import {INote, IProject, ISubSection, IUser, LoginPayload, LoginRequest, RegisterRequest, Result} from "../types" 
+import {INote, IProject, ISubSection, IUser, LoginPayload, LoginRequest, NoteWithTags, RegisterRequest, Result} from "../types" 
 import { ErrorPayload } from 'vite';
 import mongoose, { ObjectId } from 'mongoose';
 import { v4 } from 'uuid';
@@ -173,7 +173,6 @@ export const createSubSectionQuery = async (subSectionObject: ISubSection) => {
         description:subSectionObject.description
       })
       const newSubSection = await db.subSection.get(newSubSectionId)
-      console.log("new subsection: ", newSubSection);
       
       if (!newSubSection){
         throw new Error('Cannot create subsection');
@@ -184,7 +183,7 @@ export const createSubSectionQuery = async (subSectionObject: ISubSection) => {
   
 }
 
-export const createNoteQuery = async (noteObject: INote) => {
+export const createNoteQuery = async (noteObject: NoteWithTags) => {
   // if (isOfflineMode()) {
   //   const newNoteId = await db.note.add({
   //     project:Number(noteObject.projectId) || null,
@@ -246,15 +245,21 @@ export const createNoteQuery = async (noteObject: INote) => {
           dateUpdated:new Date(Date.now()),
           sources:noteObject.sources,
         })
-        let newNote = await db.note.get(newNoteId)
-        //stopped here
-        if (noteObject.tags && Array.isArray(noteObject.tags) && noteObject.tags.length > 0) {
+        if (!newNoteId) {
+          throw new Error('Cannot create note');
+        }
+        let newNote = await db.note.get(newNoteId) as NoteWithTags
+        if (noteObject.tags && noteObject.tags.length > 0) {
           await db.transaction('rw', db.tag, async () => {
             // Fetch existing tags
-            const existingTags = await db.tag.bulkGet(noteObject.tags);
+            // const existingTags = await db.tag.bulkGet(noteObject.tags);
+            const existingTags = await db.tag.bulkGet(noteObject.tags?.map((tag)=>{
+              return tag
+            }) || []);
+
         
             // Create or update tags
-            await Promise.all(noteObject.tags.map(async (tag, index) => {
+            await Promise.all(noteObject.tags?.map(async (tag, index) => {
                 const existingTag = existingTags[index];
                 if (existingTag) {
                     await db.tag.update(tag, {
@@ -266,13 +271,13 @@ export const createNoteQuery = async (noteObject: INote) => {
                         notes: [newNoteId]
                     });
                 }
-            }))
+            }) || [])
           })
           const updatedTags = await db.tag.bulkGet(noteObject.tags)
           
           newNote = {
             ...newNote,
-            tags: updatedTags
+            tags: updatedTags?.map((tag)=>tag?._id || "") || []
           }
         }
         return newNote
