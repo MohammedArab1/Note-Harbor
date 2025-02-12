@@ -18,8 +18,14 @@ import { useMutations } from '../../customHooks/useMutations';
 import ErrorAlert from './ErrorAlert';
 import { GenericModal } from './GenericModal';
 import { TagMultiSelect } from './TagMultiSelect';
+import { ITag } from '../../types';
 
-export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
+export const CreateNoteModal = ({ projectId, subSectionId, opened, close }:{
+	projectId:String,
+	subSectionId:String,
+	opened: boolean,
+	close: ()=>void
+}) => {
 	const { allProjectNotes, setAllProjectNotes, tags, setTags } =
 		React.useContext(AppDataContext);
 
@@ -34,7 +40,7 @@ export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 		resolver: yupResolver(createNoteSchema),
 	});
 	const [uniqueSources, setUniqueSources] = React.useState([]);
-	const [selectedTags, setSelectedTags] = React.useState([]);
+	const [selectedTags, setSelectedTags] = React.useState<ITag[]>([]);
 	const [addSource, setAddSource] = React.useState(false);
 	const [userSourceInput, setUserSourceInput] = React.useState('');
 	const [
