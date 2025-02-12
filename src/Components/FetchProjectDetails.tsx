@@ -38,6 +38,8 @@ const FetchProjectDetails = () => {
 			fetchProjectById(projectId),
 			fetchSubSectionsPerProjectId(projectId),
 		]);
+		console.log("project is: ", project);
+		
 		return { project, subsections };
 	};
 	useEffect(() => {
@@ -45,6 +47,7 @@ const FetchProjectDetails = () => {
 		const fetchProjectAndSubSectionsInUseEffect = async (projectId: string) => {
 			
 			const data = await fetchProjectAndSubSections(projectId);
+			console.log("fetched project and subsections, data is: ", data)
 			return data;
 		};
 		//todo add error handling here
@@ -87,12 +90,10 @@ const FetchProjectDetails = () => {
 		setqueriesFinished(false); //todo might need to remove
 		fetchAllNotesForProject(
 			projectId,
-			subSections.map((x) => {
-				return x._id;
-			})
+			subSections
 		)
 			.then((data) => {
-				setAllProjectNotes(data);
+				return setAllProjectNotes(data);
 			})
 			.catch((error) => {
 				return navigate('/UserHome');

@@ -88,7 +88,7 @@ export type LoginPayload = {
 };
 
 export type NoteWithTags = INote & {
-	tags?: string[];
+	tags?: ITag[];
 };
 
 export type RegisterRequest =  {

@@ -34,7 +34,7 @@ const ProjectDetails = () => {
 		subSections,
 		setSubSections,
 	} = useContext(AppDataContext);
-
+	console.log("in project details page")
 	const [createNoteModalOpened, createNoteModalHandler] = useDisclosure(false);
 	const [viewTagsModalOpened, viewTagsModalHandler] = useDisclosure(false);
 	const [createTagModalOpened, createTagModalHandler] = useDisclosure(false);

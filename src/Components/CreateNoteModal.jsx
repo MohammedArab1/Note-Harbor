@@ -22,6 +22,7 @@ import { TagMultiSelect } from './TagMultiSelect';
 export const CreateNoteModal = ({ projectId, subSectionId, opened, close }) => {
 	const { allProjectNotes, setAllProjectNotes, tags, setTags } =
 		React.useContext(AppDataContext);
+
 	const { createNoteMutation, updateTagNoteMutation, invalid } = useMutations();
 	const {
 		register,
