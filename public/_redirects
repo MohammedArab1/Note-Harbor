@@ -1,2 +1,2 @@
-/api/* http://5.78.120.71:3006/api/:splat 200
+/api/* http://note-harbor-app.memory-lane-app.com/api/:splat 200
 /* /index.html 200
